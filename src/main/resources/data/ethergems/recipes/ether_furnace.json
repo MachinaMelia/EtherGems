@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern":
+  [
+    "xxx",
+    "xyx",
+    "xxx"
+  ],
+  "key":
+  {
+    "x":
+    {
+      "item": "minecraft:cobblestone"
+
+    },
+    "y":
+    {
+      "tag": "ethergems:pure_crystal"
+    }
+  },
+  "result": {
+    "item": "ethergems:ether_furnace"
+  }
+}

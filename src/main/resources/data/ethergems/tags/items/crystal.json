@@ -1,0 +1,11 @@
+{
+    "replace": false,
+    "values": [
+        "ethergems:fire_crystal",
+        "ethergems:water_crystal",
+        "ethergems:ice_crystal",
+        "ethergems:wind_crystal",
+        "ethergems:earth_crystal",
+        "ethergems:electric_crystal"
+    ]
+}

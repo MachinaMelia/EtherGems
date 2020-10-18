@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "ethergems:items/rank_3/water_gem_3"
+  }
+}

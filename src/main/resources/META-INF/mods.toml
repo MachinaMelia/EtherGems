@@ -1,0 +1,34 @@
+ 
+    modLoader="javafml"
+    
+    loaderVersion="[31,)"
+   
+    issueTrackerURL="https://github.com/MachinaMelia/EtherGems/issues"
+    
+    showAsResourcePack=false
+
+    [[mods]]
+      modId="ethergems"
+      version="1.15.2-1.0.0.0"
+      displayName="Ether Gems Mod"
+      displayURL="https://github.com/MachinaMelia/EtherGems"
+      authors="MachinaMelia"
+      description='''
+      This mod is intended to bring Xenoblade Chronicles gem crafting into Minecraft as faithfully as possible.
+      In your world you will now find Ether Deposits, concentrated crystals of the World’s lifeblood. Pure Ether Deposits yield pure crystals which can be used to make a refining device known as an Ether Furnace. These crystals appear where high amounts of their respective elements are present. Normal Ether Deposits spawn in any biome, with no preference between elements, you just have to go mining. As you advance through the game, the crystals you find will be of increasingly higher quality, maxing out at level 5.
+      Adds Gems, Gem Slots on Weapons and Armor, and a Ether Furnace for crafting Gems.
+      '''
+
+      [[dependencies.ethergems]]
+        modId="forge"
+        mandatory=true
+        versionRange="[31,)"
+        ordering="NONE"
+        side="BOTH"
+
+      [[dependencies.ethergems]]
+        modId="minecraft"
+        mandatory=true
+        versionRange="[1.15.2]"
+        ordering="NONE"
+        side="BOTH"

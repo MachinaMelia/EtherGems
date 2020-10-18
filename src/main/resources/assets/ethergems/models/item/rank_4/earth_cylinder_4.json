@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "ethergems:items/rank_4/earth_cylinder_4"
+  }
+}

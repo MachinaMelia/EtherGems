@@ -1,0 +1,44 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "ethergems:items/ice_crystal"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "ethergems:level": 0.0
+      },
+      "model": "ethergems:item/ice_crystal"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.15
+      },
+      "model": "ethergems:item/rank_1/ice_crystal_1"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.3
+      },
+      "model": "ethergems:item/rank_2/ice_crystal_2"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.45
+      },
+      "model": "ethergems:item/rank_3/ice_crystal_3"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.6
+      },
+      "model": "ethergems:item/rank_4/ice_crystal_4"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.75
+      },
+      "model": "ethergems:item/rank_5/ice_crystal_5"
+    }
+  ]
+}

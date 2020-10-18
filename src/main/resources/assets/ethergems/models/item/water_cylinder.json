@@ -1,0 +1,44 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "ethergems:items/water_cylinder"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "ethergems:level": 0.0
+      },
+      "model": "ethergems:item/water_cylinder"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.15
+      },
+      "model": "ethergems:item/rank_1/water_cylinder_1"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.3
+      },
+      "model": "ethergems:item/rank_2/water_cylinder_2"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.45
+      },
+      "model": "ethergems:item/rank_3/water_cylinder_3"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.6
+      },
+      "model": "ethergems:item/rank_4/water_cylinder_4"
+    },
+    {
+      "predicate": {
+        "ethergems:level": 0.75
+      },
+      "model": "ethergems:item/rank_5/water_cylinder_5"
+    }
+  ]
+}
