@@ -1,4 +1,4 @@
-# Ether Gems ![](https://img.shields.io/github/license/MachinaMelia/EtherGems.svg) ![](https://img.shields.io/badge/release-1.15.2--1.0.0.0-brightgreen) ![](https://cf.way2muchnoise.eu/versions/413038.svg) ![](https://cf.way2muchnoise.eu/413038.svg) 
+# Ether Gems ![](https://img.shields.io/github/license/MachinaMelia/EtherGems.svg) ![](https://img.shields.io/badge/release-1.15.2--1.0.0.0--rc1-brightgreen) ![](https://cf.way2muchnoise.eu/versions/413038.svg) ![](https://cf.way2muchnoise.eu/413038.svg) 
 
 This mod is intended to bring [Xenoblade Chronicles](https://www.nintendo.com/games/detail/xenoblade-chronicles-definitive-edition-switch/) gem crafting into Minecraft as faithfully as possible.
 
