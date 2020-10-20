@@ -1,5 +1,8 @@
-# Ether Gems ![](https://img.shields.io/github/license/MachinaMelia/EtherGems.svg) ![](https://img.shields.io/badge/release-1.15.2--1.0.0.0--rc1-brightgreen) ![](http://cf.way2muchnoise.eu/versions/413038.svg) ![](http://cf.way2muchnoise.eu/413038.svg) 
-
+# Ether Gems 
+[![](https://img.shields.io/github/license/MachinaMelia/EtherGems.svg)](https://github.com/MachinaMelia/EtherGems/blob/master/LICENSE)
+ [![](https://img.shields.io/badge/release-1.15.2--1.0.0.0--rc1-brightgreen)](https://github.com/MachinaMelia/EtherGems/releases/tag/v1.15.2-1.0.0.0-rc1)
+ [![](http://cf.way2muchnoise.eu/versions/413038.svg)](https://www.curseforge.com/minecraft/mc-mods/ethergems)
+ [![](http://cf.way2muchnoise.eu/413038.svg)](https://www.curseforge.com/minecraft/mc-mods/ethergems)
 This mod is intended to bring [Xenoblade Chronicles](https://www.nintendo.com/games/detail/xenoblade-chronicles-definitive-edition-switch/) gem crafting into Minecraft as faithfully as possible.
 
 In your world you will now find Ether Deposits, concentrated crystals of the World’s lifeblood. Pure Ether Deposits yield pure crystals which can be used to make a refining device known as an Ether Furnace. These crystals appear where high amounts of their respective elements are present. Normal Ether Deposits spawn in any biome, with no preference between elements, you just have to go mining. These crystals can then be refined and added to weapons and armor that have accommodating slots for gems, granting their user unique abilities.
