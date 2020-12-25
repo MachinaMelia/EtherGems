@@ -51,9 +51,13 @@ public class CrystalInstance implements ICrystal {
             this.numAttributes = 2;
         } else {
             this.numAttributes = 4;
+            if (this.getElement().equals("Electric") && this.getLevel() == 1) {
+                this.numAttributes = 2;
+            }
         }
         this.attributes = new String[numAttributes];
         this.strengths = new int[numAttributes];
+        String[] shuffledAttributes = this.getShuffledAttributes();
         for (int i = 0; i < numAttributes; i++) {
             int strength = 0;
             int strengthRoll = randy.nextInt(10);
@@ -74,7 +78,7 @@ public class CrystalInstance implements ICrystal {
                     break;
             }
             this.strengths[i] = strength;
-            this.attributes[i] = getAttributeValues(strength, this.attributes);
+            this.attributes[i] = shuffledAttributes[i];
         }
     }
 
@@ -95,8 +99,8 @@ public class CrystalInstance implements ICrystal {
 
     public void setLevel(int level) { this.level = level; }
 
-    public String getAttributeValues(int strength, String[] previousAttributes) {
-        return "";
+    public String[] getShuffledAttributes() {
+        return null;
     }
 
     public String getAttributesTooltip() {

@@ -12,6 +12,9 @@ package machinamelia.ethergems.common.capabilities.crystals.elemental;
 
 import machinamelia.ethergems.common.capabilities.crystals.CrystalInstance;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class ElectricCrystalInstance extends CrystalInstance {
@@ -28,42 +31,31 @@ public class ElectricCrystalInstance extends CrystalInstance {
     }
 
     @Override
-    public String getAttributeValues(int strength, String[] previousAttributes) {
-        boolean shouldRollAgain;
-        int index = 0;
+    public String[] getShuffledAttributes() {
         String[] attributes = null;
-        do  {
-            shouldRollAgain = false;
-            Random randy = new Random();
-            switch(this.getLevel()) {
-                case 1:
-                    attributes = ATTRIBUTES1;
-                    break;
-                case 2:
-                    attributes = ATTRIBUTES2;
-                    break;
-                case 3:
-                    attributes = ATTRIBUTES3;
-                    break;
-                case 4:
-                    attributes = ATTRIBUTES4;
-                    break;
-                case 5:
-                    attributes = ATTRIBUTES5;
-                    break;
-                default:
-                    attributes = ATTRIBUTES1;
-            }
-            index = randy.nextInt(attributes.length);
+        switch (this.getLevel()) {
+            case 1:
+                attributes = ATTRIBUTES1;
+                break;
+            case 2:
+                attributes = ATTRIBUTES2;
+                break;
+            case 3:
+                attributes = ATTRIBUTES3;
+                break;
+            case 4:
+                attributes = ATTRIBUTES4;
+                break;
+            case 5:
+                attributes = ATTRIBUTES5;
+                break;
+            default:
+                attributes = ATTRIBUTES1;
+        }
+        List<String> attributeList = Arrays.asList(attributes);
+        Collections.shuffle(attributeList);
 
-            for (String attribute : previousAttributes) {
-                if (attribute != null && attribute.contains(attributes[index])) {
-                    shouldRollAgain = true;
-                }
-            }
-        } while (shouldRollAgain);
-
-        return attributes[index];
+        return attributeList.toArray(new String[0]);
     }
 
     @Override

@@ -13,7 +13,7 @@ package machinamelia.ethergems.common.capabilities.crystals;
 public interface ICrystal {
     public String getAttributesCSV();
     public int[] getStrengthArray();
-    public String getAttributeValues(int strength, String[] previousAttributes);
+    public String[] getShuffledAttributes();
     public void setAttributesCSV(String attributes);
     public void setStrengthArray(int[] strengths);
     public String getAttributesTooltip();

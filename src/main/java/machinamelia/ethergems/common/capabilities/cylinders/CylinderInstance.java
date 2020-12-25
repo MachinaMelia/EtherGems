@@ -82,8 +82,9 @@ public class CylinderInstance implements ICylinder, ICrystal {
         strengths[0] = this.getStrength();
         return strengths;
     }
-    public String getAttributeValues(int strength, String[] previousAttributes) {
-        return "";
+
+    public String[] getShuffledAttributes() {
+        return null;
     }
 
     public void setAttributesCSV(String attributes) {

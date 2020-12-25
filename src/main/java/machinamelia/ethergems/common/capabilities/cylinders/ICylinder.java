@@ -16,6 +16,7 @@ public interface ICylinder {
     public void setAttribute(String attribute);
     public void setStrength(int strength);
     public String getAttributeTooltip();
+    public int[] getStrengthArray();
     public int getLevel();
     public void setLevel(int level);
     public String getElement();
