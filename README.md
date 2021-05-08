@@ -53,7 +53,7 @@ You can also import the `build.gradle` file into [IntelliJ IDEA](https://www.jet
 
 ## License
 
-Copyright © 2020 MachinaMelia
+Copyright © 2020-2021 MachinaMelia
 
 The code in this project is licensed under LGPL-2.1 or later. It can be found [here](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).
 
