@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -85,7 +85,6 @@ public class PlayerUpdateEvents {
                             ItemStack itemStack = inventory.getStackInSlot(i);
                             LazyOptional<ICrystal> crystalCapability = itemStack.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
                             ICrystal crystalImpl = crystalCapability.orElse(new CrystalInstance());
-                            crystalImpl.init();
                             Random randy = new Random();
                             int randomInt = randy.nextInt(100);
                             switch(PlayerWorldEvents.getCrystalLevel()) {
@@ -129,8 +128,10 @@ public class PlayerUpdateEvents {
                                     }
                                     break;
                                 default:
+                                    crystalImpl.setLevel(1);
                                     break;
                             }
+                            crystalImpl.init();
                             ItemStack[] crystals = new ItemStack[1];
                             crystals[0] = inventory.getStackInSlot(i);
                             if (event.getPlayer().world.isRemote) {

@@ -19,8 +19,8 @@ import java.util.Random;
 
 public class IceCrystalInstance extends CrystalInstance {
 
-    private static final String[] ATTRIBUTES1 = { "Blaze Defence", "Chill Attack", "Ether Protect" };
-    private static final String[] ATTRIBUTES2 = { "Blaze Defence", "Slow" };
+    private static final String[] ATTRIBUTES1 = { "Blaze Defence", "Chill Attack", "Slow"  };
+    private static final String[] ATTRIBUTES2 = { "Blaze Defence", "Chill Attack", "Slow" };
     private static final String[] ATTRIBUTES3 = { "Bind", "Blaze Defence", "Chill Plus", "Slow" };
     private static final String[] ATTRIBUTES4 = { "Bind", "Blaze Defence", "Chill Attack", "Chill Plus", "Slow" };
     private static final String[] ATTRIBUTES5 = { "Bind", "Blaze Defence", "Chill Attack", "Chill Plus", "Slow" };

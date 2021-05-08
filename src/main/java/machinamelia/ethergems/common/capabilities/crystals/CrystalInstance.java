@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.capabilities.crystals;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.common.capabilities.crystals;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.events.PlayerWorldEvents;
 import net.minecraft.util.text.ITextComponent;
 
 import java.util.List;
@@ -42,7 +43,6 @@ public class CrystalInstance implements ICrystal {
     }
 
     public void init() {
-        this.level = 1;
         Random randy = new Random();
         int roll = randy.nextInt(100);
         if (roll < 40) {
@@ -50,10 +50,7 @@ public class CrystalInstance implements ICrystal {
         } else if (roll < 80) {
             this.numAttributes = 2;
         } else {
-            this.numAttributes = 4;
-            if (this.getElement().equals("Electric") && this.getLevel() == 1) {
-                this.numAttributes = 2;
-            }
+            this.numAttributes = 3;
         }
         this.attributes = new String[numAttributes];
         this.strengths = new int[numAttributes];
@@ -73,7 +70,7 @@ public class CrystalInstance implements ICrystal {
                 case 2:
                     strength += 35;
                     break;
-                case 4:
+                case 3:
                     strength += 80;
                     break;
             }

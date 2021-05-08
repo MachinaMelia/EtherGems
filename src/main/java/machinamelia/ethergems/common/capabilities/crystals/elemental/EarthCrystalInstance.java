@@ -19,11 +19,11 @@ import java.util.Random;
 
 public class EarthCrystalInstance extends CrystalInstance {
 
-    private static final String[] ATTRIBUTES1 = { "Attack Stability", "Bleed Defence", "Earth Cloak", "Muscle Up" };
-    private static final String[] ATTRIBUTES2 = { "Attack Stability", "Attack Plus", "Bleed Defence", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect" };
-    private static final String[] ATTRIBUTES3 = { "Attack Stability", "Attack Plus", "Bleed Defence", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Attack", "Poison Plus" };
-    private static final String[] ATTRIBUTES4 = { "Attack Stability", "Attack Plus", "Bleed Defence", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Plus" };
-    private static final String[] ATTRIBUTES5 = { "Attack Stability", "Attack Plus", "Bleed Defence", "Critical Up", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Attack", "Poison Plus" };
+    private static final String[] ATTRIBUTES1 = { "Bleed Defence", "Earth Cloak", "Muscle Up", "Physical Protect" };
+    private static final String[] ATTRIBUTES2 = { "Bleed Defence", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect" };
+    private static final String[] ATTRIBUTES3 = { "Bleed Defence", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Attack", "Poison Plus" };
+    private static final String[] ATTRIBUTES4 = { "Bleed Defence", "Critical Up", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Plus" };
+    private static final String[] ATTRIBUTES5 = { "Bleed Defence", "Critical Up", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Attack", "Poison Plus" };
 
     public EarthCrystalInstance() {
         super();
