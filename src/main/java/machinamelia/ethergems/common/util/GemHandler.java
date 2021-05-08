@@ -545,7 +545,7 @@ public class GemHandler {
                 }
             }
             break;
-            case "Ether Up":
+            /* case "Ether Up":
             {
                 if (level == 1) {
                     return getValue(crystalStrength, 1.0, 1.5);
@@ -561,7 +561,7 @@ public class GemHandler {
                     return getValue(crystalStrength, 3.5, 4.0);
                 }
             }
-            break;
+            break; */
             case "First Attack Plus":
             {
                 if (level == 1) {
@@ -664,7 +664,7 @@ public class GemHandler {
                 }
             }
             break;
-            case "Ether Def Down":
+            /* case "Ether Def Down":
             {
                 if (level == 1) {
                     return 0.5;
@@ -714,7 +714,7 @@ public class GemHandler {
                     return getValue(crystalStrength, 3.5, 4.0);
                 }
             }
-            break;
+            break; */
             case "Slow":
             {
                 if (level == 1) {
@@ -851,6 +851,7 @@ public class GemHandler {
                 }
             }
             break;
+            /*
             case "Attack Stability":
             {
                 if (level == 1) {
@@ -884,7 +885,7 @@ public class GemHandler {
                     return getValue(crystalStrength, 2.5, 3.0);
                 }
             }
-            break;
+            break; */
             case "Bleed Defence":
             {
                 if (level == 1) {
@@ -953,7 +954,7 @@ public class GemHandler {
                 }
             }
             break;
-            case "Ether Down":
+            /* case "Ether Down":
             {
                 if (level == 1) {
                     return -0.5;
@@ -969,7 +970,7 @@ public class GemHandler {
                     return -getValue(crystalStrength, 2.5, 3.0);
                 }
             }
-            break;
+            break; */
             case "Muscle Up":
             {
                 if (level == 1) {
@@ -1041,8 +1042,6 @@ public class GemHandler {
                 }
             }
             break;
-
-
 
             default: {
                 return 1;
