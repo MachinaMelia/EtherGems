@@ -99,12 +99,16 @@ public class AttackEvents {
                     firstAttack = 5.0;
                 }
             }
-            float playerYaw = normalizeAngle(player.getYaw((float) 2.0));
-            float targetYaw = normalizeAngle(target.getYaw((float) 4.0));
+            float playerYaw = player.getYaw((float) 2.0);
+            float targetYaw = target.getYaw((float) 4.0);
+            playerYaw = normalizeAngle(playerYaw);
+            targetYaw = normalizeAngle(targetYaw);
+            float lowerRange = playerYaw - 75;
+            float higherRange = playerYaw + 75;
+            lowerRange = normalizeAngle(lowerRange);
+            higherRange = normalizeAngle(higherRange);
 
-            float lowerRange = normalizeAngle(playerYaw - 55);
-            float higherRange = normalizeAngle(playerYaw + 55);
-            if (lowerRange <= targetYaw && targetYaw <= higherRange) {
+            if ((higherRange - lowerRange > 151 && ((0 < targetYaw && targetYaw < higherRange) || (lowerRange < targetYaw && targetYaw < 0))) || (higherRange - lowerRange < 151 && (lowerRange < targetYaw && targetYaw < higherRange))) {
                 backAttack = GemHandler.getPlayerGemStrength(player, "Back Attack Plus");
                 if (backAttack > 4.5) {
                     backAttack = 4.5;
