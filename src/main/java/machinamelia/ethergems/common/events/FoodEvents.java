@@ -11,14 +11,22 @@ package machinamelia.ethergems.common.events;
  */
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.stats.Stat;
+import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.util.GemHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.lang.reflect.Field;
 
 @Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class FoodEvents {
+    public static final Field saturationLevel = ObfuscationReflectionHelper.findField(FoodStats.class, "field_75125_b");
     @SubscribeEvent
     public static void eat(LivingEntityUseItemEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
@@ -28,8 +36,15 @@ public class FoodEvents {
                 fullStrength = 25.0;
             }
             if (event.getItem().isFood() && fullStrength > 0) {
-                player.getFoodStats().addStats(0, (float) (event.getItem().getItem().getFood().getSaturation() * (fullStrength / 100.0)));
+                float currentSaturation = player.getFoodStats().getSaturationLevel();
+                FoodStats food = player.getFoodStats();
+                try {
+                    saturationLevel.set(food, currentSaturation + (float) (event.getItem().getItem().getFood().getSaturation() * (fullStrength / 100.0)));
+                } catch (IllegalAccessException e) {
+                    LOGGER.warn("IllegalAccessException using reflection on PlayerEntity saturationLevel: " + e);
+                }
             }
         }
     }
+    private static final Logger LOGGER = LogManager.getLogger();
 }
