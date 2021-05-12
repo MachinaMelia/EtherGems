@@ -82,11 +82,6 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
     }
 
     @Override
-    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton) {
-        // Do nothing you fool!
-        return false;
-    }
-    @Override
     public void renderBackground() {
         super.renderBackground();
     }

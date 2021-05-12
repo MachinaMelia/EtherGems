@@ -10,6 +10,7 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.blocks.elemental.EtherDeposit;
 import machinamelia.ethergems.common.capabilities.crystals.CrystalInstance;
 import machinamelia.ethergems.common.capabilities.crystals.CrystalProvider;
 import machinamelia.ethergems.common.capabilities.crystals.ICrystal;
@@ -19,6 +20,7 @@ import net.minecraft.item.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
@@ -32,12 +34,15 @@ import machinamelia.ethergems.common.container.CrystalInventoryContainer;
 import machinamelia.ethergems.common.container.EtherFurnaceContainer;
 import machinamelia.ethergems.common.container.GemInventoryContainer;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ItemEvents {
     @SubscribeEvent
     public static void playerDropEvent(ItemTossEvent event) {
         PlayerEntity player = event.getPlayer();
-        if (player.openContainer instanceof EtherFurnaceContainer || player.openContainer instanceof CrystalInventoryContainer || player.openContainer instanceof GemInventoryContainer) {
+        if (player.openContainer instanceof EtherFurnaceContainer || player.openContainer instanceof CrystalInventoryContainer) {
             event.setCanceled(true);
             boolean hasPlaced = false;
             for (int i = 0; i < 36; i++) {
