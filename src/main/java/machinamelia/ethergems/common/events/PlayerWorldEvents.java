@@ -192,6 +192,7 @@ public class PlayerWorldEvents {
             newPlayer.getPersistentData().putInt("chill_time", 0);
             newPlayer.getPersistentData().putInt("bleed_time", 0);
             newPlayer.getPersistentData().putInt("physical_protect_time", 360);
+            newPlayer.getPersistentData().putString("remove_debuff", "");
         } else {
             ClientPlayerEntity orignalPlayer = (ClientPlayerEntity) event.getOriginal();
             ClientPlayerEntity newPlayer = (ClientPlayerEntity) event.getPlayer();
@@ -226,6 +227,7 @@ public class PlayerWorldEvents {
             newPlayer.getPersistentData().putInt("chill_time", 0);
             newPlayer.getPersistentData().putInt("bleed_time", 0);
             newPlayer.getPersistentData().putInt("physical_protect_time", 360);
+            newPlayer.getPersistentData().putString("remove_debuff", "");
         }
     }
 
@@ -292,6 +294,7 @@ public class PlayerWorldEvents {
             player.getPersistentData().putInt("chill_time", 0);
             player.getPersistentData().putInt("bleed_time", 0);
             player.getPersistentData().putInt("physical_protect_time", 360);
+            player.getPersistentData().putString("remove_debuff", "");
             SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
             NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
         }

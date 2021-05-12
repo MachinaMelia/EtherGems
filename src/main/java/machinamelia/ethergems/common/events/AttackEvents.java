@@ -198,7 +198,19 @@ public class AttackEvents {
             weaponPower = 50.0;
         }
         double debuffPlus = GemHandler.getPlayerGemStrength(player, "Debuff Plus");
-        ;
+        double debuffResist = 0;
+        int debuffRoll = 0;
+        if (target instanceof PlayerEntity) {
+            PlayerEntity targetPlayer = (PlayerEntity) target;
+            debuffResist = GemHandler.getPlayerGemStrength(targetPlayer, "Debuff Resist");
+            if (debuffResist > 100.0) {
+                debuffResist = 100.0;
+            }
+            if (debuffResist > 0) {
+                Random randy = new Random();
+                debuffRoll = randy.nextInt(100);
+            }
+        }
         if (fullStrength > 0) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
@@ -217,7 +229,7 @@ public class AttackEvents {
         if (fullStrength > 0) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower) {
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
                 target.addPotionEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
@@ -237,7 +249,7 @@ public class AttackEvents {
         if (fullStrength > 0) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower) {
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
                 target.addPotionEffect(new EffectInstance(EffectInit.BLEED_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
@@ -261,7 +273,7 @@ public class AttackEvents {
         if (fullStrength > 0) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower) {
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
                 target.addPotionEffect(new EffectInstance(Effects.POISON, 160 + (int) (160 * (debuffPlus / 100.0)), (int) Math.ceil(poisonPlus)));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
@@ -281,8 +293,8 @@ public class AttackEvents {
         if (fullStrength > 0 && (!(target instanceof EndermanEntity || target instanceof EndermiteEntity))) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower) {
-                target.addPotionEffect(new EffectInstance(EffectInit.BIND_EFFECT.get(), 40 + (int) (40 * (debuffPlus / 100.0))));
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
+                target.addPotionEffect(new EffectInstance(EffectInit.BIND_EFFECT.get(), 60 + (int) (40 * (debuffPlus / 100.0))));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
                     SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.BIND_EFFECT.get().getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
@@ -298,11 +310,11 @@ public class AttackEvents {
         if (weaponPower > 50.0) {
             weaponPower = 50.0;
         }
-        if (fullStrength > 0 && (!(target instanceof StrayEntity || target instanceof WitchEntity))) {
+        if (fullStrength > 0 && (!(target instanceof StrayEntity || target instanceof WitchEntity)) && !(debuffRoll < debuffResist)) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower) {
-                target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 80 + (int) (80 * (debuffPlus / 100.0)), 2));
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
+                target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 100 + (int) (80 * (debuffPlus / 100.0)), 2));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
                     SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), Effects.SLOWNESS.getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 2);
@@ -314,7 +326,7 @@ public class AttackEvents {
         if (fullStrength < -3.0) {
             fullStrength = -3.0;
         }
-        if (fullStrength < 0 && (!(target instanceof MagmaCubeEntity || target instanceof SlimeEntity))) {
+        if (fullStrength < 0 && (!(target instanceof MagmaCubeEntity || target instanceof SlimeEntity)) && !(debuffRoll < debuffResist)) {
             target.addPotionEffect(new EffectInstance(EffectInit.STRENGTH_DOWN_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0)), (int) -(fullStrength / 0.5)));
             if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
@@ -326,7 +338,7 @@ public class AttackEvents {
         if (fullStrength > 5.0) {
             fullStrength = 5.0;
         }
-        if (fullStrength > 0 && (!(target instanceof IronGolemEntity || target instanceof RavagerEntity))) {
+        if (fullStrength > 0 && (!(target instanceof IronGolemEntity || target instanceof RavagerEntity)) && !(debuffRoll < debuffResist)) {
             target.addPotionEffect(new EffectInstance(EffectInit.PHYS_DEF_DOWN_EFFECT.get(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) (fullStrength / 0.5)));
             if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;

@@ -300,7 +300,6 @@ public class EffectEvents {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
                                     player.removePotionEffect(Effects.SPEED);
-                                    ;
                                     player.addPotionEffect(new EffectInstance(Effects.SPEED, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
@@ -314,7 +313,6 @@ public class EffectEvents {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
                                     player.removePotionEffect(Effects.HASTE);
-                                    ;
                                     player.addPotionEffect(new EffectInstance(Effects.HASTE, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
@@ -476,24 +474,59 @@ public class EffectEvents {
                     break;
                 case "effect.minecraft.poison":
                     player.removePotionEffect(Effects.POISON);
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.chill_effect":
                     player.removePotionEffect(EffectInit.CHILL_EFFECT.get());
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.bleed_effect":
                     player.removePotionEffect(EffectInit.BLEED_EFFECT.get());
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.slowness":
                     player.removePotionEffect(Effects.SLOWNESS);
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.bind_effect":
                     player.removePotionEffect(EffectInit.BIND_EFFECT.get());
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.strength_down_effect":
                     player.removePotionEffect(EffectInit.STRENGTH_DOWN_EFFECT.get());
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.phys_def_down_effect":
                     player.removePotionEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get());
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.wither":
+                    player.removePotionEffect(Effects.WITHER);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.unluck":
+                    player.removePotionEffect(Effects.UNLUCK);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.hunger":
+                    player.removePotionEffect(Effects.HUNGER);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.weakness":
+                    player.removePotionEffect(Effects.WEAKNESS);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.mining_fatigue":
+                    player.removePotionEffect(Effects.MINING_FATIGUE);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.nausea":
+                    player.removePotionEffect(Effects.NAUSEA);
+                    player.getPersistentData().putString("remove_debuff", "");
+                    break;
+                case "effect.minecraft.blindness":
+                    player.removePotionEffect(Effects.BLINDNESS);
+                    player.getPersistentData().putString("remove_debuff", "");
                     break;
             }
             if (player.getHealth() > 1.0) {
