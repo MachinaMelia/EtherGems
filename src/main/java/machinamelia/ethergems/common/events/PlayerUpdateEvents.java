@@ -86,46 +86,21 @@ public class PlayerUpdateEvents {
                             LazyOptional<ICrystal> crystalCapability = itemStack.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
                             ICrystal crystalImpl = crystalCapability.orElse(new CrystalInstance());
                             Random randy = new Random();
-                            int randomInt = randy.nextInt(100);
                             switch(PlayerWorldEvents.getCrystalLevel()) {
                                 case 0:
                                     crystalImpl.setLevel(1);
                                     break;
                                 case 1:
-                                    if (randomInt < 50) {
-                                        crystalImpl.setLevel(2);
-                                    } else {
-                                        crystalImpl.setLevel(1);
-                                    }
+                                    crystalImpl.setLevel(2);
                                     break;
                                 case 2:
-                                    if (randomInt < 33) {
-                                        crystalImpl.setLevel(3);
-                                    } else if (randomInt < 67) {
-                                        crystalImpl.setLevel(2);
-                                    } else {
-                                        crystalImpl.setLevel(1);
-                                    }
+                                    crystalImpl.setLevel(3);
                                     break;
                                 case 3:
-                                    if (randomInt < 33) {
-                                        crystalImpl.setLevel(4);
-                                    } else if (randomInt < 67) {
-                                        crystalImpl.setLevel(3);
-                                    } else {
-                                        crystalImpl.setLevel(2);
-                                    }
+                                    crystalImpl.setLevel(4);
                                     break;
                                 case 4:
-                                    if (randomInt < 25) {
-                                        crystalImpl.setLevel(5);
-                                    } else if (randomInt < 50) {
-                                        crystalImpl.setLevel(4);
-                                    } else if (randomInt < 75) {
-                                        crystalImpl.setLevel(3);
-                                    }  else {
-                                        crystalImpl.setLevel(2);
-                                    }
+                                    crystalImpl.setLevel(5);
                                     break;
                                 default:
                                     crystalImpl.setLevel(1);
