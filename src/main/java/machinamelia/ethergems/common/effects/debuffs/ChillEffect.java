@@ -16,6 +16,7 @@ import net.minecraft.entity.monster.WitherSkeletonEntity;
 import net.minecraft.entity.passive.DolphinEntity;
 import net.minecraft.entity.passive.PolarBearEntity;
 import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
 import net.minecraft.util.DamageSource;
@@ -35,22 +36,28 @@ public class ChillEffect extends Effect {
             if (!entity.getPersistentData().contains("chill_counter")) {
                 entity.getPersistentData().putInt("chill_counter", 40);
             }
+            if (entity instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entity;
+                if (player.getPersistentData().getInt("chill_time") <= 0) {
+                    return;
+                }
+            }
             Random randy = new Random();
-            if (entity.world.isRemote && entity.getPersistentData().getInt("chill_counter") > 0) {
-                if (entity.getPersistentData().getInt("chill_counter") % 5 == 0) {
+            if (entity.world.isRemote && entity.getPersistentData().getInt("chill_counter") < 40) {
+                if (entity.getPersistentData().getInt("chill_counter") % 3 == 2) {
                     SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
-                if (entity.getPersistentData().getInt("chill_counter") % 4 == 0) {
+                if (entity.getPersistentData().getInt("chill_counter") % 3 == 1) {
                     SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
-                if (entity.getPersistentData().getInt("chill_counter") % 2 == 0) {
+                if (entity.getPersistentData().getInt("chill_counter") % 3 == 0) {
                     SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
             }
-            if (entity.getPersistentData().getInt("chill_counter") > 0) {
+            if (entity.getPersistentData().getInt("chill_counter") < 0) {
                 entity.attackEntityFrom(DamageSource.MAGIC, 1.0F);
                 entity.getPersistentData().putInt("chill_counter", 40);
             } else {

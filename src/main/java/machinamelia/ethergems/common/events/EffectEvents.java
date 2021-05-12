@@ -523,6 +523,8 @@ public class EffectEvents {
                     player.addPotionEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), newDuration, oldAmplifier));
                     player.getPersistentData().putBoolean("is_chilled", false);
                 }
+            } else if (player.getPersistentData().getBoolean("is_chilled")) {
+                player.removePotionEffect(EffectInit.CHILL_EFFECT.get());
             }
             if (player.getPersistentData().getInt("bleed_time") > 0 && player.getPersistentData().getBoolean("is_bleeding")) {
                 int newDuration = player.getPersistentData().getInt("bleed_time");
@@ -535,6 +537,5 @@ public class EffectEvents {
                 }
             }
         }
-
     }
 }
