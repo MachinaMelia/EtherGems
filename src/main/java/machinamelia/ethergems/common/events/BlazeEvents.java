@@ -10,9 +10,11 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.network.NetworkHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,6 +22,8 @@ import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.init.EffectInit;
 import machinamelia.ethergems.common.util.GemHandler;
+import net.minecraftforge.fml.network.PacketDistributor;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.Random;
 
@@ -29,11 +33,6 @@ public class BlazeEvents {
     public static void blazeEvent(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            if (player.isBurning()) {
-                player.addPotionEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), 40));
-            } else {
-                player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
-            }
             if (player.isBurning() && !player.getPersistentData().getBoolean("is_burning")) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Debuff Resist");
                 if (fullStrength > 100.0) {
@@ -53,13 +52,15 @@ public class BlazeEvents {
                 }
                 if (fullStrength < 0) {
                     int oldTimer = player.getFireTimer();
-                    int newTimer = (int) (oldTimer + ((fullStrength / 100.0) * oldTimer));
+                    int newTimer = (int) (oldTimer - ((fullStrength / 100.0) * oldTimer));
                     player.setFireTimer(newTimer);
                 }
                 player.getPersistentData().putBoolean("is_burning", true);
+                player.addPotionEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), player.getFireTimer()));
             }
             if (!player.isBurning()) {
                 player.getPersistentData().putBoolean("is_burning", false);
+                player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
             }
         }
         LivingEntity entity = event.getEntityLiving();
