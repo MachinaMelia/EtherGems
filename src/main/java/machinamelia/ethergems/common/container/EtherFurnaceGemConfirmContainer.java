@@ -137,8 +137,4 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return true;
-    }
 }

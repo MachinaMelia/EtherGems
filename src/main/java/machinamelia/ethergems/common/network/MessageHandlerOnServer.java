@@ -132,6 +132,7 @@ public class MessageHandlerOnServer {
             compoundNBT.putByte("size", (byte) 44);
             sendingPlayer.getPersistentData().put("crystal_inventory", compoundNBT);
             EtherFurnaceInventoryContainer inventoryContainer = (EtherFurnaceInventoryContainer) sendingPlayer.openContainer;
+            inventoryContainer.getTileEntity().setIsLocked(true);
             NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceOptionsContainer(i, inv, inventoryContainer.getTileEntity())), inventoryContainer.getTileEntity().getPos());
         }
         return;
@@ -161,6 +162,7 @@ public class MessageHandlerOnServer {
     {
         if (sendingPlayer.openContainer instanceof EtherFurnaceOptionsContainer) {
             EtherFurnaceOptionsContainer optionsContainer = (EtherFurnaceOptionsContainer) sendingPlayer.openContainer;
+            optionsContainer.getTileEntity().setIsLocked(true);
             NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceCraftingContainer(i, inv, optionsContainer.getTileEntity())), optionsContainer.getTileEntity().getPos());
         }
         return;
@@ -186,11 +188,12 @@ public class MessageHandlerOnServer {
                     }
                 }
             }
-
+            EtherFurnaceCylinderConfirmContainer craftingContainer = (EtherFurnaceCylinderConfirmContainer) sendingPlayer.openContainer;
             if (!shouldClose) {
-                EtherFurnaceCylinderConfirmContainer craftingContainer = (EtherFurnaceCylinderConfirmContainer) sendingPlayer.openContainer;
+                craftingContainer.getTileEntity().setIsLocked(true);
                 NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceGemConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getPos());
             } else {
+                craftingContainer.getTileEntity().setIsLocked(false);
                 sendingPlayer.closeScreen();
             }
         }
@@ -224,6 +227,7 @@ public class MessageHandlerOnServer {
     public static void openCylinderConfirmContainer(ServerPlayerEntity sendingPlayer) {
         if (sendingPlayer.openContainer instanceof EtherFurnaceCraftingContainer) {
             EtherFurnaceCraftingContainer craftingContainer = (EtherFurnaceCraftingContainer) sendingPlayer.openContainer;
+            craftingContainer.getTileEntity().setIsLocked(true);
             NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceCylinderConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getPos());
         }
     }
@@ -250,7 +254,7 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(OpenCylinderConfirmContainerMessage message, ServerPlayerEntity sendingPlayer)
     {
-       openCylinderConfirmContainer(sendingPlayer);
+        openCylinderConfirmContainer(sendingPlayer);
         return;
     }
     public static void onMessageReceived(final PutGemsInInventoryMessage message, Supplier<NetworkEvent.Context> ctxSupplier) {

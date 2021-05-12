@@ -152,8 +152,4 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return true;
-    }
 }

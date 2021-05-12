@@ -224,13 +224,9 @@ public class EtherFurnaceCraftingContainer  extends EtherFurnaceContainer {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return true;
-    }
-
-    @Override
     public void onContainerClosed(PlayerEntity playerIn) {
         this.resetButtonCounter();
+        super.onContainerClosed(playerIn);
     }
 
 }
