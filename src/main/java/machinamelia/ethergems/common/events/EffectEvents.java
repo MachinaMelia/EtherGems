@@ -40,7 +40,6 @@ public class EffectEvents {
     private static int entityTickCounter = 40;
     private static int entityTickCounter2 = 40;
     private static int entityTickCounter3 = 40;
-    private static int entityTickCounter4 = 40;
 
     @SubscribeEvent
     public static void giveEffects(PlayerEvent event) {
@@ -509,6 +508,8 @@ public class EffectEvents {
                     player.addPotionEffect(new EffectInstance(Effects.POISON, newDuration, oldAmplifier));
                     player.getPersistentData().putBoolean("is_poisoned", false);
                 }
+            } else if (player.getPersistentData().getBoolean("is_poisoned")) {
+                player.removePotionEffect(Effects.POISON);
             }
             if (player.getPersistentData().getInt("chill_time") > 0 && player.getPersistentData().getBoolean("is_chilled")) {
                 int newDuration = player.getPersistentData().getInt("chill_time");

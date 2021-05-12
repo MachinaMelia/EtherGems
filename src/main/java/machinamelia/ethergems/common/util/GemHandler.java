@@ -1025,20 +1025,17 @@ public class GemHandler {
             case "Poison Plus":
             {
                 if (level == 1) {
-                    return 0.5;
+                    return 1;
                 } else if (level == 2) {
-                    return getValue(crystalStrength, 0.5, 1.0);
+                    return Math.ceil(getValue(crystalStrength, 1.0, 2.0));
                 } else if (level == 3) {
-                    return getValue(crystalStrength, 1.0, 1.5);
-
+                    return Math.ceil(getValue(crystalStrength, 2.0, 3.0));
                 } else if (level == 4) {
-                    return getValue(crystalStrength, 1.5, 2.0);
-
+                    return Math.ceil(getValue(crystalStrength, 4.0, 5.0));
                 } else if (level == 5) {
-                    return getValue(crystalStrength, 2.0, 2.5);
-
+                    return Math.ceil(getValue(crystalStrength, 6.0, 7.0));
                 } else if (level == 6) {
-                    return getValue(crystalStrength, 2.5, 3.0);
+                    return Math.ceil(getValue(crystalStrength, 8.0, 9.0));
                 }
             }
             break;
@@ -1121,7 +1118,6 @@ public class GemHandler {
            case "Blaze Attack":
            case "Slow Resist":
            case "Debuff Resist":
-           case "Poison Defence":
            case "Chill Attack":
            case "Bleed Attack":
            case "Good Footing":
@@ -1134,8 +1130,7 @@ public class GemHandler {
            case "Recovery Up":
            case "Chill Plus":
            case "Bleed Plus":
-           case "Muscle Up":
-           case "Poison Plus": {
+           case "Muscle Up": {
                return 3;
            }
            case "Strength Down": {
@@ -1155,6 +1150,9 @@ public class GemHandler {
            }
            case "Spike": {
                return 6;
+           }
+           case "Poison Plus": {
+               return 10;
            }
            case "HP Up": {
                return 7*8;
@@ -1185,7 +1183,8 @@ public class GemHandler {
            }
            case "Chill Defence":
            case "Blaze Defence":
-           case "Bleed Defence": {
+           case "Bleed Defence":
+           case "Poison Defence": {
                return -100;
            }
            case "Debuff Plus": {

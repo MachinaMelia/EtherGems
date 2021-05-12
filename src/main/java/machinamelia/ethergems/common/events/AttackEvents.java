@@ -189,13 +189,6 @@ public class AttackEvents {
         if (fullStrength > 0) {
             target.getPersistentData().putDouble("bleed_plus_damage", fullStrength);
         }
-        fullStrength = GemHandler.getPlayerGemStrength(player, "Poison Plus");
-        if (fullStrength > 3.0) {
-            fullStrength = 3.0;
-        }
-        if (fullStrength > 0) {
-            target.getPersistentData().putDouble("poison_plus_damage", fullStrength);
-        }
         fullStrength = GemHandler.getPlayerGemStrength(player, "Blaze Attack");
         if (fullStrength > 100.0) {
             fullStrength = 100.0;
@@ -257,6 +250,10 @@ public class AttackEvents {
         if (fullStrength > 100.0) {
             fullStrength = 100.0;
         }
+        double poisonPlus = GemHandler.getPlayerGemStrength(player, "Poison Plus");
+        if (poisonPlus > 10.0) {
+            poisonPlus = 10.0;
+        }
         weaponPower = GemHandler.getPlayerGemStrength(player, "Weapon Power");
         if (weaponPower > 50.0) {
             weaponPower = 50.0;
@@ -265,10 +262,10 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower) {
-                target.addPotionEffect(new EffectInstance(Effects.POISON, 160 + (int) (160 * (debuffPlus / 100.0))));
+                target.addPotionEffect(new EffectInstance(Effects.POISON, 160 + (int) (160 * (debuffPlus / 100.0)), (int) Math.ceil(poisonPlus)));
                 if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), Effects.POISON.getName(), 160 + (int) (160 * (debuffPlus / 100.0)), 0);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), Effects.POISON.getName(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) poisonPlus);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
