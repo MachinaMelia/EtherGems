@@ -138,13 +138,15 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (player.world.isRemote && roll < fullStrength) {
-                net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, target, true, true ? 1.5F : 1.0F);
                 player.world.playSound((PlayerEntity) null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
                 ClientPlayerEntity clientPlayer = (ClientPlayerEntity) player;
                 clientPlayer.onCriticalHit(target);
-                target.attackEntityFrom(DamageSource.causePlayerDamage(player), (float) strengthUp + (1 + weaponBaseDamage + (float) hitResult.getDamageModifier()) - target.getTotalArmorValue() + (float) firstAttack + (float) backAttack + (float) (physDefDown * 0.5));
+            }
+            if (roll < fullStrength) {
+                net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, target, true, true ? 1.5F : 1.0F);
+                target.attackEntityFrom(DamageSource.causePlayerDamage(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) * 1.5F - target.getTotalArmorValue() + (float) (physDefDown * 0.5));
             } else {
-                target.attackEntityFrom(DamageSource.causePlayerDamage(player), (float) strengthUp + (1 + weaponBaseDamage) - target.getTotalArmorValue() + (float) firstAttack + (float) backAttack + (float) (physDefDown * 0.5));
+                target.attackEntityFrom(DamageSource.causePlayerDamage(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) - target.getTotalArmorValue() + (float) (physDefDown * 0.5));
             }
         }
         if (target instanceof PlayerEntity) {
