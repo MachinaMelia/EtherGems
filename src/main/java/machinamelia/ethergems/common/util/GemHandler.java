@@ -1126,7 +1126,6 @@ public class GemHandler {
            case "Bleed Attack":
            case "Good Footing":
            case "Poison Attack":
-           case "Bleed Defence":
            case "Spike Defence": {
                return 100;
            }
@@ -1185,7 +1184,8 @@ public class GemHandler {
                 return 150;
            }
            case "Chill Defence":
-           case "Blaze Defence": {
+           case "Blaze Defence":
+           case "Bleed Defence": {
                return -100;
            }
            case "Debuff Plus": {

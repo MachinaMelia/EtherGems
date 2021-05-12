@@ -16,12 +16,14 @@ import net.minecraft.entity.monster.StrayEntity;
 import net.minecraft.entity.monster.WitherSkeletonEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.horse.SkeletonHorseEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
 import net.minecraft.util.DamageSource;
 import machinamelia.ethergems.common.init.EffectInit;
 import machinamelia.ethergems.common.network.NetworkHandler;
 import machinamelia.ethergems.common.network.server.SendParticleToServerWorldMessage;
+import net.minecraftforge.event.world.NoteBlockEvent;
 
 import java.util.Random;
 
@@ -35,14 +37,20 @@ public class BleedEffect extends Effect {
             if (!entity.getPersistentData().contains("bleed_counter")) {
                 entity.getPersistentData().putInt("bleed_counter", 40);
             }
+            if (entity instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entity;
+                if (player.getPersistentData().getInt("bleed_time") <= 0) {
+                    return;
+                }
+            }
             Random randy = new Random();
             if (entity.world.isRemote) {
-                if (entity.getPersistentData().getInt("bleed_counter") > 0 && entity.getPersistentData().getInt("bleed_counter") % 10 == 0) {
+                if (entity.getPersistentData().getInt("bleed_counter") < 40 && entity.getPersistentData().getInt("bleed_counter") % 2 == 0) {
                     SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(0, (float) entity.getPosX(), (float) (entity.getPosY() + randy.nextDouble()), (float) entity.getPosZ(), 0.0f, 0.0f, 0.0f);
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
             }
-            if (entity.getPersistentData().getInt("bleed_counter") > 0) {
+            if (entity.getPersistentData().getInt("bleed_counter") < 0) {
                 entity.attackEntityFrom(DamageSource.MAGIC, 1.0F);
                 entity.getPersistentData().putInt("bleed_counter", 40);
             } else {
