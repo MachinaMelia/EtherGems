@@ -10,6 +10,23 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.capabilities.armor.ISlottedArmor;
+import machinamelia.ethergems.common.capabilities.armor.SlottedArmorInstance;
+import machinamelia.ethergems.common.capabilities.armor.SlottedArmorProvider;
+import machinamelia.ethergems.common.capabilities.gems.GemInstance;
+import machinamelia.ethergems.common.capabilities.gems.GemProvider;
+import machinamelia.ethergems.common.capabilities.gems.IGem;
+import machinamelia.ethergems.common.capabilities.weapons.ISlottedWeapon;
+import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponInstance;
+import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponProvider;
+import machinamelia.ethergems.common.container.ContainerProvider;
+import machinamelia.ethergems.common.container.GemInventoryContainer;
+import machinamelia.ethergems.common.init.ContainerInit;
+import machinamelia.ethergems.common.items.gems.Gem;
+import machinamelia.ethergems.common.items.weapon.SlottedAxe;
+import machinamelia.ethergems.common.items.weapon.SlottedSword;
+import machinamelia.ethergems.common.network.server.OpenGemInventoryMessage;
+import machinamelia.ethergems.common.network.server.SendArmorGemToServerMessage;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +44,7 @@ import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.PacketDistributor;
 import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.capabilities.world.CrystalLevelInstance;
@@ -37,6 +55,7 @@ import machinamelia.ethergems.common.network.client.SendAffinityToClientPlayer;
 import machinamelia.ethergems.common.network.server.PutGemsInInventoryMessage;
 import machinamelia.ethergems.common.util.GemHandler;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -246,6 +265,13 @@ public class PlayerWorldEvents {
             compoundNBT.putBoolean("Legs", event.getPlayer().inventory.armorInventory.get(2).getItem() != null);
             compoundNBT.putBoolean("Feet", event.getPlayer().inventory.armorInventory.get(3).getItem() != null);
             event.getPlayer().getPersistentData().put("armor_slots", compoundNBT);
+        }
+        // Allow equipment to get gems on respawn by opening and closing the gem inventory
+        if (!event.getPlayer().world.isRemote) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.closeContainer();
+            serverPlayer.closeScreen();
         }
         if (!event.getPlayer().world.isRemote) {
             ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
