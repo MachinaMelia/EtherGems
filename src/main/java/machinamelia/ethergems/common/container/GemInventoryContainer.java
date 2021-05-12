@@ -95,15 +95,16 @@ public class GemInventoryContainer extends Container {
             ItemStack armor = armorList.next();
             LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
             ISlottedArmor armorInstance = armorCapability.orElse(new SlottedArmorInstance());
-            if (!(armor.getItem() instanceof SwordItem) && !armor.getItem().equals(Items.AIR) && !armorInstance.equals(Items.AIR) && armorInstance.getSlots() > 0) {
-                this.addSlot(new SlotItemHandler(items, this.size, 38, 29 + ((3 - i) * slotSizePlus2)));
-                this.size++;
-                this.hasArmor[i] = true;
-            }
+            this.addSlot(new SlotItemHandler(items, this.size, 38, 29 + ((3 - i) * slotSizePlus2)));
+            this.size++;
+            this.hasArmor[i] = true;
         }
 
         // Weapon Slots
-
+        for (int i = 0; i < 3; i++) {
+            this.addSlot(new SlotItemHandler(items, this.size + i, 38 + i * slotSizePlus2, 8));
+            this.swordSlots++;
+        }
         ItemStack weapon = this.playerInventory.player.getHeldItemMainhand();
         if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
             LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
@@ -112,41 +113,7 @@ public class GemInventoryContainer extends Container {
                 weaponInstance.init();
             }
             if (!weapon.getItem().equals(Items.AIR) && !weaponInstance.equals(Items.AIR) && weaponInstance.getSlots() > 0) {
-                for (int i = 0; i < weaponInstance.getSlots(); i++) {
-                    this.addSlot(new SlotItemHandler(items, this.size + i, 38 + i * slotSizePlus2, 8));
-                    this.swordSlots++;
-                }
-            }
-        } else {
-            CompoundNBT compoundNBT = (CompoundNBT) this.playerInventory.player.getPersistentData().get("gem_inventory");
-            ItemStack[] items = new ItemStack[44];
-            if (compoundNBT != null) {
-                ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
-                readItemStacksFromTag(items, listNBT, 44);
-                ArrayList<ItemStack> gems = new ArrayList<ItemStack>();
-                for (int i = 0; i < 3; i++) {
-                    gems.add(items[41 + i]);
-                }
-                for (ItemStack gem : gems) {
-                    boolean itemPlaced = false;
-                    for (int i = 0; i < 44; i++) {
-                        if (!itemPlaced && items[i] != null && items[i].getItem().equals(Items.AIR)) {
-                            items[i] = gem;
-                            itemPlaced = true;
-                        } else if (!itemPlaced && items[i] == null) {
-                            items[i] = gem;
-                            itemPlaced = true;
-                        }
-                    }
-                }
-                if (this.playerInventory.player.world.isRemote) {
-                    PutGemsInInventoryMessage putGemsInInventoryMessage = new PutGemsInInventoryMessage(gems.toArray(new ItemStack[0]));
-                    NetworkHandler.simpleChannel.sendToServer(putGemsInInventoryMessage);
-                }
-                compoundNBT = new CompoundNBT();
-                compoundNBT.put("Items", writeItemStacksToTag(items, 44, 44));
-                compoundNBT.putByte("size", (byte) 44);
-                this.playerInventory.player.getPersistentData().put("gem_inventory", compoundNBT);
+
             }
         }
     }
@@ -228,7 +195,7 @@ public class GemInventoryContainer extends Container {
                 if (this.hasArmor[i]) {
                     itemStacks[i + 37] = this.items.getStackInSlot(i + 37 - spaces);
                 } else {
-                    spaces++;
+                     spaces++;
                 }
             }
             if (swordSlots > 0) {
