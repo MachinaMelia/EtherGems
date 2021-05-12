@@ -1388,17 +1388,25 @@ public class GemHandler {
                 ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
                 readItemStacksFromTag(items, listNBT);
             }
-            for (int i = 41; i < 44; i++) {
-                if (items[i] != null && items[i].getItem() instanceof Gem) {
-                    LazyOptional<IGem> gemCapability = items[i].getCapability(GemProvider.GEM_CAPABILITY);
-                    IGem gemInstance = gemCapability.orElse(new GemInstance());
-                    String gemAttribute = gemInstance.getAttribute();
-                    double strength = gemInstance.getStrength();
-                    if (gemAttribute != null && !gemAttribute.equals("")) {
-                        if (gemAttribute.equals(attribute)) {
-                            fullStrength += strength;
+            ItemStack weapon = player.getHeldItemMainhand();
+            if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
+                LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
+                try {
+                    ISlottedWeapon weaponInstance = weaponCapability.orElseThrow(IllegalStateException::new);
+                    for (int i = 41; i < 41 + weaponInstance.getSlots(); i++) {
+                        if (items[i] != null && items[i].getItem() instanceof Gem) {
+                            LazyOptional<IGem> gemCapability = items[i].getCapability(GemProvider.GEM_CAPABILITY);
+                            IGem gemInstance = gemCapability.orElse(new GemInstance());
+                            String gemAttribute = gemInstance.getAttribute();
+                            double strength = gemInstance.getStrength();
+                            if (gemAttribute != null && !gemAttribute.equals("")) {
+                                if (gemAttribute.equals(attribute)) {
+                                    fullStrength += strength;
+                                }
+                            }
                         }
                     }
+                } catch (IllegalStateException e) {
                 }
             }
         }
