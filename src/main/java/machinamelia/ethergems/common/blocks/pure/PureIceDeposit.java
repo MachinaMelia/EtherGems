@@ -32,8 +32,4 @@ public class PureIceDeposit extends PureEtherDeposit {
     protected IParticleData getEtherParticle() {
         return ParticleInit.ICE_ETHER_PARTICLE.get();
     }
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        return super.getDrops(state, builder);
-    }
 }

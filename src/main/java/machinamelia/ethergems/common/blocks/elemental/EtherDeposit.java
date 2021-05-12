@@ -32,12 +32,4 @@ public class EtherDeposit extends Block {
     protected Item getCrystal() {
         return null;
     }
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        List<ItemStack> list = Lists.newArrayList();
-        ItemStack stack = ItemStack.EMPTY;
-        stack = new ItemStack(getCrystal());
-        list.add(stack);
-        return list;
-    }
 }

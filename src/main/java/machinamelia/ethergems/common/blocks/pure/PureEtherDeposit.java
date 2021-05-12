@@ -37,13 +37,6 @@ public class PureEtherDeposit extends EtherDeposit {
                 .harvestTool(ToolType.PICKAXE)
                 .lightValue(10));
     }
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        List<ItemStack> list = Lists.newArrayList();
-        ItemStack stack = new ItemStack(getCrystal());
-        list.add(stack);
-        return list;
-    }
     protected IParticleData getEtherParticle() {
         return null;
     }
