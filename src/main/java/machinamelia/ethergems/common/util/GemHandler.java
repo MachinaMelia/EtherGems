@@ -344,17 +344,17 @@ public class GemHandler {
             case "Aquatic Cloak":
             {
                 if (level == 1) {
-                    return getPercentage(crystalStrength, 2, 10);
+                    return getPercentage(crystalStrength, 10, 22);
                 } else if (level == 2) {
-                    return getPercentage(crystalStrength, 12, 20);
+                    return getPercentage(crystalStrength, 23, 36);
                 } else if (level == 3) {
-                    return getPercentage(crystalStrength, 22, 30);
+                    return getPercentage(crystalStrength, 37, 49);
                 } else if (level == 4) {
-                    return getPercentage(crystalStrength, 32, 40);
+                    return getPercentage(crystalStrength, 50, 63);
                 } else if (level == 5) {
-                    return getPercentage(crystalStrength, 42, 50);
+                    return getPercentage(crystalStrength, 64, 76);
                 } else if (level == 6) {
-                    return getPercentage(crystalStrength, 52, 60);
+                    return getPercentage(crystalStrength, 77, 90);
                 }
             }
             break;
@@ -735,17 +735,17 @@ public class GemHandler {
             case "Aerial Cloak":
             {
                 if (level == 1) {
-                    return getPercentage(crystalStrength, 2, 10);
+                    return getPercentage(crystalStrength, 10, 22);
                 } else if (level == 2) {
-                    return getPercentage(crystalStrength, 12, 20);
+                    return getPercentage(crystalStrength, 23, 36);
                 } else if (level == 3) {
-                    return getPercentage(crystalStrength, 22, 30);
+                    return getPercentage(crystalStrength, 37, 49);
                 } else if (level == 4) {
-                    return getPercentage(crystalStrength, 32, 40);
+                    return getPercentage(crystalStrength, 50, 63);
                 } else if (level == 5) {
-                    return getPercentage(crystalStrength, 42, 50);
+                    return getPercentage(crystalStrength, 64, 76);
                 } else if (level == 6) {
-                    return getPercentage(crystalStrength, 52, 60);
+                    return getPercentage(crystalStrength, 77, 90);
                 }
             }
             break;
@@ -940,17 +940,17 @@ public class GemHandler {
             case "Earth Cloak":
             {
                 if (level == 1) {
-                    return getPercentage(crystalStrength, 2, 10);
+                    return getPercentage(crystalStrength, 10, 22);
                 } else if (level == 2) {
-                    return getPercentage(crystalStrength, 12, 20);
+                    return getPercentage(crystalStrength, 23, 36);
                 } else if (level == 3) {
-                    return getPercentage(crystalStrength, 22, 30);
+                    return getPercentage(crystalStrength, 37, 49);
                 } else if (level == 4) {
-                    return getPercentage(crystalStrength, 32, 40);
+                    return getPercentage(crystalStrength, 50, 63);
                 } else if (level == 5) {
-                    return getPercentage(crystalStrength, 42, 50);
+                    return getPercentage(crystalStrength, 64, 76);
                 } else if (level == 6) {
-                    return getPercentage(crystalStrength, 52, 60);
+                    return getPercentage(crystalStrength, 77, 90);
                 }
             }
             break;
@@ -1176,7 +1176,7 @@ public class GemHandler {
            case "Aquatic Cloak":
            case "Aerial Cloak":
            case "Earth Cloak": {
-               return 60;
+               return 90;
            }
            case "Fall Defence": {
                return 72;

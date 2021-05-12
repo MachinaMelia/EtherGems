@@ -36,23 +36,17 @@ public class FollowRangeEvents {
             int baseRange = 16;
             if (entity instanceof ZombieEntity) {
                 if (entity instanceof ZombiePigmanEntity) {
-                    baseRange = 35;
-                } else if (entity instanceof DrownedEntity) {
-                    baseRange = 20;
-                } else if (entity instanceof ZombieVillagerEntity) {
-                    baseRange = 40;
-                } else if (entity instanceof HuskEntity){
-                    baseRange = 40;
+                    baseRange = 29;
                 } else {
-                    baseRange = 40;
+                    baseRange = 33;
                 }
             } else if (entity instanceof BlazeEntity) {
                 baseRange = 48;
             } else if (entity instanceof GhastEntity) {
                 baseRange = 64;
             } else if (entity instanceof PillagerEntity) {
-                baseRange = 64;
-            } else if (entity instanceof  RavagerEntity) {
+                baseRange = 28;
+            } else if (entity instanceof RavagerEntity) {
                 baseRange = 32;
             } else if (entity instanceof EvokerEntity) {
                 baseRange = 12;
@@ -62,27 +56,27 @@ public class FollowRangeEvents {
 
             if (entity instanceof DrownedEntity || entity instanceof GuardianEntity || entity instanceof PufferfishEntity || entity instanceof DolphinEntity) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Aquatic Cloak");
-                if (fullStrength > 60.0) {
-                    fullStrength = 60.0;
+                if (fullStrength > 90.0) {
+                    fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) ((fullStrength / 100.0) * baseRange)));
+                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
                 }
-            } else if (entity instanceof BeeEntity || entity instanceof  GhastEntity || entity instanceof EnderDragonEntity || entity instanceof VexEntity || entity instanceof PhantomEntity || entity instanceof BlazeEntity) {
+            } else if (entity instanceof BeeEntity || entity instanceof GhastEntity || entity instanceof EnderDragonEntity || entity instanceof VexEntity || entity instanceof PhantomEntity || entity instanceof BlazeEntity) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Aerial Cloak");
-                if (fullStrength > 60.0) {
-                    fullStrength = 60.0;
+                if (fullStrength > 90.0) {
+                    fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) ((fullStrength / 100.0) * baseRange)));
+                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
                 }
             } else {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Earth Cloak");
-                if (fullStrength > 60.0) {
-                    fullStrength = 60.0;
+                if (fullStrength > 90.0) {
+                    fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) ((fullStrength / 100.0) * baseRange)));
+                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
                 }
             }
         }
