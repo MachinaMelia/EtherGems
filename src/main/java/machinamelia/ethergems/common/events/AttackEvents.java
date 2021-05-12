@@ -415,16 +415,20 @@ public class AttackEvents {
             if (source instanceof LivingEntity) {
                 LivingEntity livingSource = (LivingEntity) source;
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Spike");
+                if (fullStrength > 6.0) {
+                    fullStrength = 6.0;
+                }
                 double resistStrength = 0;
                 if (!(livingSource instanceof PlayerEntity) && fullStrength > 0) {
                     livingSource.attackEntityFrom(DamageSource.causeThornsDamage(player), (float) fullStrength);
                 }
-                if (event.getSource().damageType.equals("thorns")) {
+                if (!(livingSource instanceof PlayerEntity) && event.getSource().damageType.equals("thorns")) {
                     resistStrength = GemHandler.getPlayerGemStrength(player, "Spike Defence");
-                    if (resistStrength > 0 && resistStrength < event.getAmount()) {
-                        player.heal((float) (resistStrength));
-                    } else if (resistStrength > 0) {
-                        player.heal(event.getAmount());
+                    if (resistStrength > 100.0) {
+                        resistStrength = 100.0;
+                    }
+                    if (resistStrength > 0) {
+                        player.heal((float) (resistStrength / 100.0) * event.getAmount());
                     }
                 }
                 fullStrength = GemHandler.getPlayerGemStrength(player, "Damage Heal");
