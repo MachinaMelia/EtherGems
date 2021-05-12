@@ -19,7 +19,7 @@ import java.util.Random;
 
 public class ElectricCrystalInstance extends CrystalInstance {
 
-    private static final String[] ATTRIBUTES1 = { "Double Attack", "First Attack Plus" };
+    private static final String[] ATTRIBUTES1 = { "Double Attack", "First Attack Plus", "Phys Def Down" };
     private static final String[] ATTRIBUTES2 = { "Back Attack Plus", "Double Attack", "First Attack Plus", "Phys Def Down" };
     private static final String[] ATTRIBUTES3 = { "Back Attack Plus", "Double Attack", "First Attack Plus", "Phys Def Down" };
     private static final String[] ATTRIBUTES4 = { "Double Attack", "First Attack Plus", "Phys Def Down" };
