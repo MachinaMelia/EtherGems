@@ -95,6 +95,9 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
         super.handleMouseClick(slotIn, slotId, mouseButton, type);
         if (slotId >= 37) {
             UpdateGemEvents.updateServerPlayerGems(this.player, true);
+            if (this.player.world.isRemote) {
+                drawGuiContainerForegroundLayer(0, 0);
+            }
         }
     }
 
