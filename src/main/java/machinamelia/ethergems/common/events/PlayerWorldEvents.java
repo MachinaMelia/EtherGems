@@ -134,6 +134,17 @@ public class PlayerWorldEvents {
     }
 
     @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        // Allow equipment to get gems on respawn by opening and closing the gem inventory
+        if (!event.getPlayer().world.isRemote) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.closeContainer();
+            serverPlayer.closeScreen();
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (!event.getPlayer().world.isRemote) {
             ServerPlayerEntity orignalPlayer = (ServerPlayerEntity) event.getOriginal();
@@ -147,31 +158,6 @@ public class PlayerWorldEvents {
 
             newPlayer.getPersistentData().put("crystal_inventory", orignalPlayer.getPersistentData().get("crystal_inventory"));
             CompoundNBT compoundNBT = (CompoundNBT) orignalPlayer.getPersistentData().get("gem_inventory");
-            ItemStack[] items = new ItemStack[44];
-            if (compoundNBT != null) {
-                ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
-                readItemStacksFromTag(items, listNBT);
-            }
-            ItemStack[] equipmentGems = new ItemStack[7];
-            for (int i = 0; i < 7; i++) {
-                equipmentGems[i] = items[37 + i];
-                items[37 + i] = ItemStack.EMPTY;
-            }
-            for (ItemStack gem : equipmentGems) {
-                boolean itemPlaced = false;
-                for (int i = 0; i < 44; i++) {
-                    if (!itemPlaced && items[i] != null && items[i].getItem().equals(Items.AIR)) {
-                        items[i] = gem;
-                        itemPlaced = true;
-                    } else if (!itemPlaced && items[i] == null) {
-                        items[i] = gem;
-                        itemPlaced = true;
-                    }
-                }
-            }
-            compoundNBT = new CompoundNBT();
-            compoundNBT.put("Items", writeItemStacksToTag(items, 44));
-            compoundNBT.putByte("size", (byte) 44);
             newPlayer.getPersistentData().put("gem_inventory", compoundNBT);
 
             ItemStack[] empty = new ItemStack[27];
@@ -180,6 +166,13 @@ public class PlayerWorldEvents {
             compoundNBT.putByte("size", (byte) 27);
             newPlayer.getPersistentData().put("gem_confirm_inventory", compoundNBT);
             newPlayer.getPersistentData().put("armor_slots", orignalPlayer.getPersistentData().get("armor_slots"));
+
+            // Allow equipment to get gems on respawn by opening and closing the gem inventory
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.closeContainer();
+            serverPlayer.closeScreen();
+
             newPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
             newPlayer.getPersistentData().putBoolean("secondAttack", false);
             newPlayer.getPersistentData().putBoolean("should_die", false);
@@ -198,21 +191,6 @@ public class PlayerWorldEvents {
             ClientPlayerEntity newPlayer = (ClientPlayerEntity) event.getPlayer();
             newPlayer.getPersistentData().put("crystal_inventory", orignalPlayer.getPersistentData().get("crystal_inventory"));
             CompoundNBT compoundNBT = (CompoundNBT) orignalPlayer.getPersistentData().get("gem_inventory");
-            ItemStack[] items = new ItemStack[44];
-            if (compoundNBT != null) {
-                ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
-                readItemStacksFromTag(items, listNBT);
-            }
-            ItemStack[] equipmentGems = new ItemStack[7];
-            for (int i = 0; i < 7; i++) {
-                equipmentGems[i] = items[37 + i];
-                items[37 + i] = ItemStack.EMPTY;
-            }
-            PutGemsInInventoryMessage putGemsInInventoryMessage = new PutGemsInInventoryMessage(equipmentGems);
-            NetworkHandler.simpleChannel.sendToServer(putGemsInInventoryMessage);
-            compoundNBT = new CompoundNBT();
-            compoundNBT.put("Items", writeItemStacksToTag(items, 44));
-            compoundNBT.putByte("size", (byte) 44);
             newPlayer.getPersistentData().put("gem_inventory", compoundNBT);
             newPlayer.getPersistentData().put("armor_slots", orignalPlayer.getPersistentData().get("armor_slots"));
             newPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
