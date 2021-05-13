@@ -37,8 +37,6 @@ import machinamelia.ethergems.common.items.weapon.SlottedAxe;
 import machinamelia.ethergems.common.items.weapon.SlottedSword;
 import machinamelia.ethergems.common.network.client.RenderParticleOnClientMessage;
 import machinamelia.ethergems.common.network.server.*;
-import machinamelia.ethergems.common.util.MaxHealthHandler;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.*;
 import java.util.function.Supplier;

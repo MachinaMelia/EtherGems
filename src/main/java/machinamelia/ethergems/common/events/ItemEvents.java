@@ -10,17 +10,11 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.common.blocks.elemental.EtherDeposit;
-import machinamelia.ethergems.common.capabilities.crystals.CrystalInstance;
-import machinamelia.ethergems.common.capabilities.crystals.CrystalProvider;
-import machinamelia.ethergems.common.capabilities.crystals.ICrystal;
-import machinamelia.ethergems.common.items.crystals.Crystal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
@@ -32,10 +26,6 @@ import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponInstance;
 import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponProvider;
 import machinamelia.ethergems.common.container.CrystalInventoryContainer;
 import machinamelia.ethergems.common.container.EtherFurnaceContainer;
-import machinamelia.ethergems.common.container.GemInventoryContainer;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ItemEvents {

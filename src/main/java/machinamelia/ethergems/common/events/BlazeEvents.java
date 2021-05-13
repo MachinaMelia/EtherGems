@@ -10,11 +10,9 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.common.network.NetworkHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,8 +20,6 @@ import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.init.EffectInit;
 import machinamelia.ethergems.common.util.GemHandler;
-import net.minecraftforge.fml.network.PacketDistributor;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.Random;
 

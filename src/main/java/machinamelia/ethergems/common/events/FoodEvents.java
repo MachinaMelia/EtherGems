@@ -11,7 +11,6 @@ package machinamelia.ethergems.common.events;
  */
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.stats.Stat;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

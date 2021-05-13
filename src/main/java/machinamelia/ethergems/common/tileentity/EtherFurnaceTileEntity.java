@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
-
 public class EtherFurnaceTileEntity extends LockableLootTileEntity implements ITickableTileEntity {
 
     private final int[][] engineerAbilities = { { 25, 25, 50 }, { 80, 10, 10 }, { 15, 60, 25 }, { 60, 15, 25 }, { 10, 80, 10 }, { 10, 10, 80 }, { 5, 90, 5 } };

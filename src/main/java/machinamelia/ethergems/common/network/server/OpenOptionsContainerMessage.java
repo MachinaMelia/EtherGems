@@ -12,13 +12,10 @@ package machinamelia.ethergems.common.network.server;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.common.util.LazyOptional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraftforge.common.util.LazyOptional;;
 import machinamelia.ethergems.common.capabilities.crystals.CrystalInstance;
 import machinamelia.ethergems.common.capabilities.crystals.CrystalProvider;
 import machinamelia.ethergems.common.capabilities.crystals.ICrystal;
-
 
 public class OpenOptionsContainerMessage {
 

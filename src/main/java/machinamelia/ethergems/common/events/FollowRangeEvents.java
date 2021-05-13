@@ -18,7 +18,6 @@ import net.minecraft.entity.passive.DolphinEntity;
 import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -10,31 +10,15 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.common.capabilities.armor.ISlottedArmor;
-import machinamelia.ethergems.common.capabilities.armor.SlottedArmorInstance;
-import machinamelia.ethergems.common.capabilities.armor.SlottedArmorProvider;
-import machinamelia.ethergems.common.capabilities.gems.GemInstance;
-import machinamelia.ethergems.common.capabilities.gems.GemProvider;
-import machinamelia.ethergems.common.capabilities.gems.IGem;
-import machinamelia.ethergems.common.capabilities.weapons.ISlottedWeapon;
-import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponInstance;
-import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponProvider;
 import machinamelia.ethergems.common.container.ContainerProvider;
 import machinamelia.ethergems.common.container.GemInventoryContainer;
 import machinamelia.ethergems.common.init.ContainerInit;
-import machinamelia.ethergems.common.items.gems.Gem;
-import machinamelia.ethergems.common.items.weapon.SlottedAxe;
-import machinamelia.ethergems.common.items.weapon.SlottedSword;
-import machinamelia.ethergems.common.network.server.OpenGemInventoryMessage;
-import machinamelia.ethergems.common.network.server.SendArmorGemToServerMessage;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.server.ServerWorld;
@@ -52,14 +36,11 @@ import machinamelia.ethergems.common.capabilities.world.CrystalLevelProvider;
 import machinamelia.ethergems.common.capabilities.world.ICrystalLevel;
 import machinamelia.ethergems.common.network.NetworkHandler;
 import machinamelia.ethergems.common.network.client.SendAffinityToClientPlayer;
-import machinamelia.ethergems.common.network.server.PutGemsInInventoryMessage;
 import machinamelia.ethergems.common.util.GemHandler;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static machinamelia.ethergems.common.container.EtherFurnaceContainer.readItemStacksFromTag;
 import static machinamelia.ethergems.common.container.EtherFurnaceContainer.writeItemStacksToTag;
 
 @Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)

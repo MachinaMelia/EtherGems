@@ -27,8 +27,6 @@ import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.world.feature.structures.OseTowerPieces;
 import machinamelia.ethergems.common.world.feature.structures.OseTowerStructure;
 
-import java.util.Locale;
-
 public class FeatureInit {
 
     public static final DeferredRegister<Feature<?>> FEATURES = new DeferredRegister<Feature<?>>(ForgeRegistries.FEATURES, EtherGems.MOD_ID);

@@ -12,9 +12,6 @@ package machinamelia.ethergems.common.network.server;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 public class PutGemsInInventoryMessage {
 

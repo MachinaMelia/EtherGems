@@ -33,6 +33,7 @@ import machinamelia.ethergems.common.items.EtherGemsItemTier;
 import machinamelia.ethergems.common.items.crystals.Crystal;
 import machinamelia.ethergems.common.items.cylinders.*;
 import machinamelia.ethergems.common.items.gems.Gem;
+
 @Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TooltipEvents {
     @OnlyIn(Dist.CLIENT)

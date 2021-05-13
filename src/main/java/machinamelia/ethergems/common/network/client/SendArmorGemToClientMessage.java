@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 
 public class SendArmorGemToClientMessage {
 
-
     public int index;
     public String uuid;
     public ItemStack armorGem;

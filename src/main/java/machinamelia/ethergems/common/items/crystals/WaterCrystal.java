@@ -11,9 +11,7 @@ package machinamelia.ethergems.common.items.crystals;
  */
 
 public class WaterCrystal extends Crystal {
-
     public WaterCrystal() {
         super();
     }
-
 }
