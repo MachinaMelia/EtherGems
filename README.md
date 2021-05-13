@@ -22,11 +22,10 @@ Download one of the pre-built `.jar` files from the Releases section or build yo
 
 Place it in your `.minecraft/mods` folder and enjoy!
 
+**Note: This mod depends on the [Polymorph mod](https://www.curseforge.com/minecraft/mc-mods/polymorph)**
+
 ## Submit an Issue
 This mod is new and may have incompatibilites with other mods. Please let us know these so we can fix them. You can submit issues [here](https://github.com/MachinaMelia/EtherGems/issues).
-
-##### Known issues
-Using other mods with this mod has a high chance to cause weapons to be crafted without slots. Use the [Polymorph mod](https://www.curseforge.com/minecraft/mc-mods/polymorph) to solve this.
 
 ## Building
 
