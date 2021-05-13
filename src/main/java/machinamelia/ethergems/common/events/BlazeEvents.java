@@ -42,6 +42,7 @@ public class BlazeEvents {
                     Random randy = new Random();
                     int roll = randy.nextInt(100);
                     if (roll < fullStrength) {
+                        player.getPersistentData().putBoolean("is_burning", false);
                         player.extinguish();
                         player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
                     }
@@ -50,13 +51,23 @@ public class BlazeEvents {
                 if (fullStrength < -100.0) {
                     fullStrength = -100.0;
                 }
-                if (fullStrength < 0) {
-                    int oldTimer = player.getFireTimer();
-                    int newTimer = (int) (oldTimer - ((fullStrength / 100.0) * oldTimer));
-                    player.setFireTimer(newTimer);
+                if (fullStrength == -100.0) {
+                    player.getPersistentData().putBoolean("is_burning", false);
+                    player.extinguish();
+                    player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
+                } else {
+                    if (fullStrength < 0) {
+                        int oldTimer = player.getFireTimer();
+                        int newTimer = (int) (oldTimer + ((fullStrength / 100.0) * oldTimer));
+                        player.setFireTimer(newTimer);
+                    }
+                    int timer = player.getFireTimer();
+                    if (timer < 0) {
+                        timer = 0;
+                    }
+                    player.getPersistentData().putBoolean("is_burning", true);
+                    player.addPotionEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), timer));
                 }
-                player.getPersistentData().putBoolean("is_burning", true);
-                player.addPotionEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), player.getFireTimer()));
             }
             if (!player.isBurning()) {
                 player.getPersistentData().putBoolean("is_burning", false);
