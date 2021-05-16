@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -15,7 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.BlazeEntity;
 import net.minecraft.entity.monster.MagmaCubeEntity;
 import net.minecraft.entity.monster.WitherSkeletonEntity;
-import net.minecraft.entity.monster.ZombiePigmanEntity;
+import net.minecraft.entity.monster.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -33,7 +33,7 @@ import machinamelia.ethergems.common.util.MaxHealthHandler;
 
 import java.util.Random;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EffectEvents {
 
     private static int clientTickCounter = 20;
@@ -56,21 +56,21 @@ public class EffectEvents {
                 fullStrength = 50.0;
             }
             if (fullStrength > 0) {
-                player.addPotionEffect(new EffectInstance(EffectInit.HASTE_EFFECT.get(), 160, (int) fullStrength));
+                player.addEffect(new EffectInstance(EffectInit.HASTE_EFFECT.get(), 160, (int) fullStrength));
             }
             fullStrength = GemHandler.getPlayerGemStrength(player, "Quick Step");
             if (fullStrength > 25.0) {
                 fullStrength = 25.0;
             }
             if (fullStrength > 0) {
-                player.addPotionEffect(new EffectInstance(EffectInit.SPEED_EFFECT.get(), 160, (int) fullStrength));
+                player.addEffect(new EffectInstance(EffectInit.SPEED_EFFECT.get(), 160, (int) fullStrength));
             }
             fullStrength = GemHandler.getPlayerGemStrength(player, "Muscle Up");
             if (fullStrength > 3) {
                 fullStrength = 3;
             }
             if (fullStrength > 0) {
-                player.addPotionEffect(new EffectInstance(EffectInit.RESISTANCE_EFFECT.get(), 160, (int) (fullStrength / 0.5)));
+                player.addEffect(new EffectInstance(EffectInit.RESISTANCE_EFFECT.get(), 160, (int) (fullStrength / 0.5)));
             }
         }
     }
@@ -115,13 +115,13 @@ public class EffectEvents {
 
     @SubscribeEvent
     public static void performDOTEffects(LivingEvent.LivingUpdateEvent event) {
-        EffectInstance chillEffect = event.getEntityLiving().getActivePotionEffect(EffectInit.CHILL_EFFECT.get());
+        EffectInstance chillEffect = event.getEntityLiving().getEffect(EffectInit.CHILL_EFFECT.get());
         if (chillEffect != null) {
-            chillEffect.performEffect(event.getEntityLiving());
+            chillEffect.applyEffect(event.getEntityLiving());
         }
-        EffectInstance bleedEffect = event.getEntityLiving().getActivePotionEffect(EffectInit.BLEED_EFFECT.get());
+        EffectInstance bleedEffect = event.getEntityLiving().getEffect(EffectInit.BLEED_EFFECT.get());
         if (bleedEffect != null) {
-            bleedEffect.performEffect(event.getEntityLiving());
+            bleedEffect.applyEffect(event.getEntityLiving());
         }
     }
     @SubscribeEvent
@@ -129,11 +129,11 @@ public class EffectEvents {
         Entity entity = event.getEntity();
         if (entity instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) entity;
-            if (!(livingEntity instanceof BlazeEntity || livingEntity instanceof ZombiePigmanEntity || livingEntity instanceof MagmaCubeEntity || livingEntity instanceof WitherSkeletonEntity)) {
+            if (!(livingEntity instanceof BlazeEntity || livingEntity instanceof ZombifiedPiglinEntity || livingEntity instanceof MagmaCubeEntity || livingEntity instanceof WitherSkeletonEntity)) {
                 double fullStrength = entity.getPersistentData().getDouble("blaze_plus_damage");
                 if (fullStrength > 0.0 && entityTickCounter <= 0) {
-                    if (livingEntity.isBurning()) {
-                        livingEntity.attackEntityFrom(DamageSource.ON_FIRE, (float) fullStrength);
+                    if (livingEntity.isOnFire()) {
+                        livingEntity.hurt(DamageSource.ON_FIRE, (float) fullStrength);
                     } else {
                         livingEntity.getPersistentData().putDouble("blaze_plus_damage", 0.0);
                     }
@@ -144,8 +144,8 @@ public class EffectEvents {
             }
             double fullStrength = entity.getPersistentData().getDouble("chill_plus_damage");
             if (fullStrength > 0.0 && entityTickCounter2 <= 0) {
-                if (livingEntity.getActivePotionEffect(EffectInit.CHILL_EFFECT.get()) != null) {
-                    livingEntity.attackEntityFrom(DamageSource.MAGIC, (float) fullStrength);
+                if (livingEntity.getEffect(EffectInit.CHILL_EFFECT.get()) != null) {
+                    livingEntity.hurt(DamageSource.MAGIC, (float) fullStrength);
                 } else {
                     livingEntity.getPersistentData().putDouble("chill_plus_damage", 0.0);
                 }
@@ -155,8 +155,8 @@ public class EffectEvents {
             }
             fullStrength = entity.getPersistentData().getDouble("bleed_plus_damage");
             if (fullStrength > 0.0 && entityTickCounter3 <= 0) {
-                if (livingEntity.getActivePotionEffect(EffectInit.BLEED_EFFECT.get()) != null) {
-                    livingEntity.attackEntityFrom(DamageSource.MAGIC, (float) fullStrength);
+                if (livingEntity.getEffect(EffectInit.BLEED_EFFECT.get()) != null) {
+                    livingEntity.hurt(DamageSource.MAGIC, (float) fullStrength);
                 } else {
                     livingEntity.getPersistentData().putDouble("bleed_plus_damage", 0.0);
                 }
@@ -170,7 +170,7 @@ public class EffectEvents {
     public static void potionEffectEvent(PotionEvent.PotionAddedEvent event) {
         if (event.getEntity() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntity();
-            if (event.getPotionEffect().getEffectName().equals("effect.minecraft.slowness") && event.getEntity() instanceof PlayerEntity) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.minecraft.slowness") && event.getEntity() instanceof PlayerEntity) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Slow Resist");
                 if (fullStrength > 100.0) {
                     fullStrength = 100.0;
@@ -187,7 +187,7 @@ public class EffectEvents {
                     player.getPersistentData().putBoolean("shouldRemoveSlowness", false);
                 }
             }
-            if (event.getPotionEffect().getEffectName().equals("effect.ethergems.bind_effect")) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.ethergems.bind_effect")) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Bind Resist");
                 if (fullStrength > 100.0) {
                     fullStrength = 100.0;
@@ -200,17 +200,17 @@ public class EffectEvents {
                     player.getPersistentData().putBoolean("shouldRemoveBind", false);
                 }
             }
-            if ((event.getPotionEffect().getEffectName().equals("effect.minecraft.slowness") || event.getPotionEffect().getEffectName().equals("effect.minecraft.wither") || event.getPotionEffect().getEffectName().equals("effect.minecraft.unluck") || event.getPotionEffect().getEffectName().equals("effect.minecraft.hunger") || event.getPotionEffect().getEffectName().equals("effect.minecraft.weakness") || event.getPotionEffect().getEffectName().equals("effect.minecraft.mining_fatigue") || event.getPotionEffect().getEffectName().equals("effect.minecraft.nausea") || event.getPotionEffect().getEffectName().equals("effect.minecraft.blindness") || event.getPotionEffect().getEffectName().equals("effect.ethergems.bind_effect") || event.getPotionEffect().getEffectName().equals("effect.minecraft.poison") || event.getPotionEffect().getEffectName().equals("effect.ethergems.chill_effect") || event.getPotionEffect().getEffectName().equals("effect.ethergems.bleed_effect") || event.getPotionEffect().getEffectName().equals("effect.ethergems.strength_down_effect") || event.getPotionEffect().getEffectName().equals("effect.ethergems.phys_def_down_effect"))) {
+            if ((event.getPotionEffect().getDescriptionId().equals("effect.minecraft.slowness") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.wither") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.unluck") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.hunger") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.weakness") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.mining_fatigue") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.nausea") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.blindness") || event.getPotionEffect().getDescriptionId().equals("effect.ethergems.bind_effect") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.poison") || event.getPotionEffect().getDescriptionId().equals("effect.ethergems.chill_effect") || event.getPotionEffect().getDescriptionId().equals("effect.ethergems.bleed_effect") || event.getPotionEffect().getDescriptionId().equals("effect.ethergems.strength_down_effect") || event.getPotionEffect().getDescriptionId().equals("effect.ethergems.phys_def_down_effect"))) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Debuff Resist");
                 Random randy = new Random();
                 int roll = randy.nextInt(100);
                 if (roll < fullStrength) {
-                    player.getPersistentData().putString("remove_debuff", event.getPotionEffect().getEffectName());
+                    player.getPersistentData().putString("remove_debuff", event.getPotionEffect().getDescriptionId());
                 } else {
                     player.getPersistentData().putString("remove_debuff", "");
                 }
             }
-            if (event.getPotionEffect().getEffectName().equals("effect.minecraft.poison")) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.minecraft.poison")) {
                 if (player.getPersistentData().getInt("poison_time") <= 0) {
                     double fullStrength = GemHandler.getPlayerGemStrength(player, "Poison Defence");
                     if (fullStrength < -100.0) {
@@ -230,7 +230,7 @@ public class EffectEvents {
                     }
                 }
             }
-            if (event.getPotionEffect().getEffectName().equals("effect.ethergems.chill_effect")) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.ethergems.chill_effect")) {
                 if (player.getPersistentData().getInt("chill_time") <= 0) {
                     double fullStrength = GemHandler.getPlayerGemStrength(player, "Chill Defence");
                     if (fullStrength < -100.0) {
@@ -250,7 +250,7 @@ public class EffectEvents {
                     }
                 }
             }
-            if (event.getPotionEffect().getEffectName().equals("effect.ethergems.bleed_effect")) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.ethergems.bleed_effect")) {
                 if (player.getPersistentData().getInt("bleed_time") <= 0) {
                     double fullStrength = GemHandler.getPlayerGemStrength(player, "Bleed Defence");
                     if (fullStrength < -100.0) {
@@ -270,14 +270,14 @@ public class EffectEvents {
                     }
                 }
             }
-            if (event.getPotionEffect().getEffectName().equals("effect.minecraft.speed") || event.getPotionEffect().getEffectName().equals("effect.minecraft.haste") || event.getPotionEffect().getEffectName().equals("effect.minecraft.strength") || event.getPotionEffect().getEffectName().equals("effect.minecraft.jump_boost") || event.getPotionEffect().getEffectName().equals("effect.minecraft.regeneration") || event.getPotionEffect().getEffectName().equals("effect.minecraft.resistance") || event.getPotionEffect().getEffectName().equals("effect.minecraft.fire_resistance") || event.getPotionEffect().getEffectName().equals("effect.minecraft.water_breathing") || event.getPotionEffect().getEffectName().equals("effect.minecraft.invisibility") || event.getPotionEffect().getEffectName().equals("effect.minecraft.night_vision") || event.getPotionEffect().getEffectName().equals("effect.minecraft.absorption") || event.getPotionEffect().getEffectName().equals("effect.minecraft.luck") || event.getPotionEffect().getEffectName().equals("effect.minecraft.slow_falling")) {
-                if (!player.world.isRemote) {
+            if (event.getPotionEffect().getDescriptionId().equals("effect.minecraft.speed") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.haste") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.strength") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.jump_boost") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.regeneration") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.resistance") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.fire_resistance") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.water_breathing") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.invisibility") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.night_vision") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.absorption") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.luck") || event.getPotionEffect().getDescriptionId().equals("effect.minecraft.slow_falling")) {
+                if (!player.level.isClientSide) {
                     double buffTimePlus = GemHandler.getPlayerGemStrength(player, "Buff Time Plus");
                     if (buffTimePlus > 150.0) {
                         buffTimePlus = 150.0;
                     }
                     if (buffTimePlus > 9 && player.getPersistentData().getString("remove_buff").equals("")) {
-                        player.getPersistentData().putString("remove_buff", event.getPotionEffect().getEffectName());
+                        player.getPersistentData().putString("remove_buff", event.getPotionEffect().getDescriptionId());
                         player.getPersistentData().putInt("buff_duration", (int) (event.getPotionEffect().getDuration() * (buffTimePlus / 100.0)));
                     }
                 }
@@ -289,18 +289,18 @@ public class EffectEvents {
     public static void removeBuffs(PlayerEvent event) {
         if (event.getPlayer() != null) {
             PlayerEntity player = event.getPlayer();
-            if (!player.world.isRemote) {
+            if (!player.level.isClientSide) {
                 String buff = player.getPersistentData().getString("remove_buff");
                 int buffTime = player.getPersistentData().getInt("buff_duration");
                 if (buffTime > 0) {
                     switch (buff) {
                         case "effect.minecraft.speed":
-                            EffectInstance oldEffect = player.getActivePotionEffect(Effects.SPEED);
+                            EffectInstance oldEffect = player.getEffect(Effects.MOVEMENT_SPEED);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.SPEED);
-                                    player.addPotionEffect(new EffectInstance(Effects.SPEED, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.MOVEMENT_SPEED);
+                                    player.addEffect(new EffectInstance(Effects.MOVEMENT_SPEED, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -308,12 +308,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.haste":
-                            oldEffect = player.getActivePotionEffect(Effects.HASTE);
+                            oldEffect = player.getEffect(Effects.DIG_SPEED);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.HASTE);
-                                    player.addPotionEffect(new EffectInstance(Effects.HASTE, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.DIG_SPEED);
+                                    player.addEffect(new EffectInstance(Effects.DIG_SPEED, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -321,13 +321,13 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.strength":
-                            oldEffect = player.getActivePotionEffect(Effects.STRENGTH);
+                            oldEffect = player.getEffect(Effects.DAMAGE_BOOST);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.STRENGTH);
+                                    player.removeEffect(Effects.DAMAGE_BOOST);
                                     ;
-                                    player.addPotionEffect(new EffectInstance(Effects.STRENGTH, buffTime, oldAmplifier));
+                                    player.addEffect(new EffectInstance(Effects.DAMAGE_BOOST, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -335,13 +335,13 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.jump_boost":
-                            oldEffect = player.getActivePotionEffect(Effects.JUMP_BOOST);
+                            oldEffect = player.getEffect(Effects.JUMP);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.JUMP_BOOST);
+                                    player.removeEffect(Effects.JUMP);
                                     ;
-                                    player.addPotionEffect(new EffectInstance(Effects.JUMP_BOOST, buffTime, oldAmplifier));
+                                    player.addEffect(new EffectInstance(Effects.JUMP, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -349,12 +349,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.regeneration":
-                            oldEffect = player.getActivePotionEffect(Effects.REGENERATION);
+                            oldEffect = player.getEffect(Effects.REGENERATION);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.REGENERATION);
-                                    player.addPotionEffect(new EffectInstance(Effects.REGENERATION, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.REGENERATION);
+                                    player.addEffect(new EffectInstance(Effects.REGENERATION, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -362,12 +362,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.resistance":
-                            oldEffect = player.getActivePotionEffect(Effects.RESISTANCE);
+                            oldEffect = player.getEffect(Effects.DAMAGE_RESISTANCE);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.RESISTANCE);
-                                    player.addPotionEffect(new EffectInstance(Effects.RESISTANCE, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.DAMAGE_RESISTANCE);
+                                    player.addEffect(new EffectInstance(Effects.DAMAGE_RESISTANCE, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -375,12 +375,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.fire_resistance":
-                            oldEffect = player.getActivePotionEffect(Effects.FIRE_RESISTANCE);
+                            oldEffect = player.getEffect(Effects.FIRE_RESISTANCE);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.FIRE_RESISTANCE);
-                                    player.addPotionEffect(new EffectInstance(Effects.FIRE_RESISTANCE, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.FIRE_RESISTANCE);
+                                    player.addEffect(new EffectInstance(Effects.FIRE_RESISTANCE, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -388,12 +388,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.water_breathing":
-                            oldEffect = player.getActivePotionEffect(Effects.WATER_BREATHING);
+                            oldEffect = player.getEffect(Effects.WATER_BREATHING);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.WATER_BREATHING);
-                                    player.addPotionEffect(new EffectInstance(Effects.WATER_BREATHING, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.WATER_BREATHING);
+                                    player.addEffect(new EffectInstance(Effects.WATER_BREATHING, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -401,12 +401,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.invisibility":
-                            oldEffect = player.getActivePotionEffect(Effects.INVISIBILITY);
+                            oldEffect = player.getEffect(Effects.INVISIBILITY);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.INVISIBILITY);
-                                    player.addPotionEffect(new EffectInstance(Effects.INVISIBILITY, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.INVISIBILITY);
+                                    player.addEffect(new EffectInstance(Effects.INVISIBILITY, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -414,12 +414,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.absorption":
-                            oldEffect = player.getActivePotionEffect(Effects.ABSORPTION);
+                            oldEffect = player.getEffect(Effects.ABSORPTION);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.ABSORPTION);
-                                    player.addPotionEffect(new EffectInstance(Effects.ABSORPTION, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.ABSORPTION);
+                                    player.addEffect(new EffectInstance(Effects.ABSORPTION, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -427,12 +427,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.luck":
-                            oldEffect = player.getActivePotionEffect(Effects.LUCK);
+                            oldEffect = player.getEffect(Effects.LUCK);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.LUCK);
-                                    player.addPotionEffect(new EffectInstance(Effects.LUCK, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.LUCK);
+                                    player.addEffect(new EffectInstance(Effects.LUCK, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -440,12 +440,12 @@ public class EffectEvents {
                             }
                             break;
                         case "effect.minecraft.slow_falling":
-                            oldEffect = player.getActivePotionEffect(Effects.SLOW_FALLING);
+                            oldEffect = player.getEffect(Effects.SLOW_FALLING);
                             if (oldEffect != null) {
                                 int oldAmplifier = oldEffect.getAmplifier();
                                 if (player != null) {
-                                    player.removePotionEffect(Effects.SLOW_FALLING);
-                                    player.addPotionEffect(new EffectInstance(Effects.SLOW_FALLING, buffTime, oldAmplifier));
+                                    player.removeEffect(Effects.SLOW_FALLING);
+                                    player.addEffect(new EffectInstance(Effects.SLOW_FALLING, buffTime, oldAmplifier));
                                     player.getPersistentData().putString("remove_buff", "");
                                     player.getPersistentData().putInt("buff_duration", 0);
                                     player.getPersistentData().putBoolean("is_new", true);
@@ -462,70 +462,70 @@ public class EffectEvents {
         if (event.getPlayer() != null) {
             PlayerEntity player = event.getPlayer();
             if (player.getPersistentData().getBoolean("shouldRemoveSlowness")) {
-                player.removePotionEffect(Effects.SLOWNESS);
+                player.removeEffect(Effects.MOVEMENT_SLOWDOWN);
                 player.getPersistentData().putBoolean("shouldRemoveSlowness", false);
             }
             if (player.getPersistentData().getBoolean("shouldRemoveBind")) {
-                player.removePotionEffect(EffectInit.BIND_EFFECT.get());
+                player.removeEffect(EffectInit.BIND_EFFECT.get());
                 player.getPersistentData().putBoolean("shouldRemoveBind", false);
             }
             switch (player.getPersistentData().getString("remove_debuff")) {
                 case "":
                     break;
                 case "effect.minecraft.poison":
-                    player.removePotionEffect(Effects.POISON);
+                    player.removeEffect(Effects.POISON);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.chill_effect":
-                    player.removePotionEffect(EffectInit.CHILL_EFFECT.get());
+                    player.removeEffect(EffectInit.CHILL_EFFECT.get());
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.bleed_effect":
-                    player.removePotionEffect(EffectInit.BLEED_EFFECT.get());
+                    player.removeEffect(EffectInit.BLEED_EFFECT.get());
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.slowness":
-                    player.removePotionEffect(Effects.SLOWNESS);
+                    player.removeEffect(Effects.MOVEMENT_SLOWDOWN);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.bind_effect":
-                    player.removePotionEffect(EffectInit.BIND_EFFECT.get());
+                    player.removeEffect(EffectInit.BIND_EFFECT.get());
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.strength_down_effect":
-                    player.removePotionEffect(EffectInit.STRENGTH_DOWN_EFFECT.get());
+                    player.removeEffect(EffectInit.STRENGTH_DOWN_EFFECT.get());
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.ethergems.phys_def_down_effect":
-                    player.removePotionEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get());
+                    player.removeEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get());
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.wither":
-                    player.removePotionEffect(Effects.WITHER);
+                    player.removeEffect(Effects.WITHER);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.unluck":
-                    player.removePotionEffect(Effects.UNLUCK);
+                    player.removeEffect(Effects.UNLUCK);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.hunger":
-                    player.removePotionEffect(Effects.HUNGER);
+                    player.removeEffect(Effects.HUNGER);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.weakness":
-                    player.removePotionEffect(Effects.WEAKNESS);
+                    player.removeEffect(Effects.WEAKNESS);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.mining_fatigue":
-                    player.removePotionEffect(Effects.MINING_FATIGUE);
+                    player.removeEffect(Effects.DIG_SLOWDOWN);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.nausea":
-                    player.removePotionEffect(Effects.NAUSEA);
+                    player.removeEffect(Effects.CONFUSION);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
                 case "effect.minecraft.blindness":
-                    player.removePotionEffect(Effects.BLINDNESS);
+                    player.removeEffect(Effects.BLINDNESS);
                     player.getPersistentData().putString("remove_debuff", "");
                     break;
             }
@@ -534,35 +534,35 @@ public class EffectEvents {
             }
             if (player.getPersistentData().getInt("poison_time") > 0 && player.getPersistentData().getBoolean("is_poisoned")) {
                 int newDuration = player.getPersistentData().getInt("poison_time");
-                EffectInstance oldEffect = player.getActivePotionEffect(Effects.POISON);
+                EffectInstance oldEffect = player.getEffect(Effects.POISON);
                 if (oldEffect != null) {
                     int oldAmplifier = oldEffect.getAmplifier();
-                    player.removePotionEffect(Effects.POISON);
-                    player.addPotionEffect(new EffectInstance(Effects.POISON, newDuration, oldAmplifier));
+                    player.removeEffect(Effects.POISON);
+                    player.addEffect(new EffectInstance(Effects.POISON, newDuration, oldAmplifier));
                     player.getPersistentData().putBoolean("is_poisoned", false);
                 }
             } else if (player.getPersistentData().getBoolean("is_poisoned")) {
-                player.removePotionEffect(Effects.POISON);
+                player.removeEffect(Effects.POISON);
             }
             if (player.getPersistentData().getInt("chill_time") > 0 && player.getPersistentData().getBoolean("is_chilled")) {
                 int newDuration = player.getPersistentData().getInt("chill_time");
-                EffectInstance oldEffect = player.getActivePotionEffect(EffectInit.CHILL_EFFECT.get());
+                EffectInstance oldEffect = player.getEffect(EffectInit.CHILL_EFFECT.get());
                 if (oldEffect != null) {
                     int oldAmplifier = oldEffect.getAmplifier();
-                    player.removePotionEffect(EffectInit.CHILL_EFFECT.get());
-                    player.addPotionEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), newDuration, oldAmplifier));
+                    player.removeEffect(EffectInit.CHILL_EFFECT.get());
+                    player.addEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), newDuration, oldAmplifier));
                     player.getPersistentData().putBoolean("is_chilled", false);
                 }
             } else if (player.getPersistentData().getBoolean("is_chilled")) {
-                player.removePotionEffect(EffectInit.CHILL_EFFECT.get());
+                player.removeEffect(EffectInit.CHILL_EFFECT.get());
             }
             if (player.getPersistentData().getInt("bleed_time") > 0 && player.getPersistentData().getBoolean("is_bleeding")) {
                 int newDuration = player.getPersistentData().getInt("bleed_time");
-                EffectInstance oldEffect = player.getActivePotionEffect(EffectInit.BLEED_EFFECT.get());
+                EffectInstance oldEffect = player.getEffect(EffectInit.BLEED_EFFECT.get());
                 if (oldEffect != null) {
                     int oldAmplifier = oldEffect.getAmplifier();
-                    player.removePotionEffect(EffectInit.BLEED_EFFECT.get());
-                    player.addPotionEffect(new EffectInstance(EffectInit.BLEED_EFFECT.get(), newDuration, oldAmplifier));
+                    player.removeEffect(EffectInit.BLEED_EFFECT.get());
+                    player.addEffect(new EffectInstance(EffectInit.BLEED_EFFECT.get(), newDuration, oldAmplifier));
                     player.getPersistentData().putBoolean("is_bleeding", false);
                 }
             }

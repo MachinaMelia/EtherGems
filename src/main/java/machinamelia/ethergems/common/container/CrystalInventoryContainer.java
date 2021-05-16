@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -66,7 +66,7 @@ public class CrystalInventoryContainer extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         return ItemStack.EMPTY;
     }
 
@@ -78,7 +78,7 @@ public class CrystalInventoryContainer extends Container {
             ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
             readItemStacksFromTag(items, listNBT);
             for (int i = 0; i < 36; i++) {
-                this.putStackInSlot(i, items[i]);
+                this.setItem(i, items[i]);
             }
         }
     }
@@ -89,7 +89,7 @@ public class CrystalInventoryContainer extends Container {
             CompoundNBT tag = new CompoundNBT();
             tag.putShort("Slot", (short) i);
             if (items[i] != null) {
-                items[i].write(tag);
+                items[i].save(tag);
                 if (maxQuantity > Short.MAX_VALUE) {
                     tag.putInt("Quantity", items[i].getCount());
                 } else if (maxQuantity > Byte.MAX_VALUE) {
@@ -105,19 +105,19 @@ public class CrystalInventoryContainer extends Container {
         for (int i = 0; i < 36; i++) {
             CompoundNBT tag = tagList.getCompound(i);
             int b = tag.getShort("Slot");
-            items[b] = ItemStack.read(tag);
+            items[b] = ItemStack.of(tag);
             INBT quant = tag.get("Quantity");
             if (quant instanceof NumberNBT) {
-                items[b].setCount(((NumberNBT) quant).getInt());
+                items[b].setCount(((NumberNBT) quant).getAsInt());
             }
         }
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-        ItemStack stack = super.slotClick(slotId, dragType, clickTypeIn, player);
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
         if (slotId == 36) {
-            this.putStackInSlot(slotId, ItemStack.EMPTY);
+            this.setItem(slotId, ItemStack.EMPTY);
             ItemStack[] itemStacks = new ItemStack[36];
             for (int i = 0; i < 36; i++) {
                 itemStacks[i] = this.items.getStackInSlot(i);
@@ -136,7 +136,7 @@ public class CrystalInventoryContainer extends Container {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 }

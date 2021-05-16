@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.init;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -22,7 +22,7 @@ import machinamelia.ethergems.common.blocks.elemental.*;
 import machinamelia.ethergems.common.blocks.pure.*;
 
 public class BlockInit {
-    public static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, EtherGems.MOD_ID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, EtherGems.MOD_ID);
     // Blocks
     public static final RegistryObject<Block> FIRE_DEPOSIT = BLOCKS.register("fire_deposit", FireDeposit::new);
     public static final RegistryObject<Block> WATER_DEPOSIT = BLOCKS.register("water_deposit", WaterDeposit::new);

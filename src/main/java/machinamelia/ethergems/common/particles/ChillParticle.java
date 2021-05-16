@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.particles;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -13,8 +13,8 @@ package machinamelia.ethergems.common.particles;
 import net.minecraft.client.particle.IAnimatedSprite;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particles.BasicParticleType;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -22,13 +22,13 @@ import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public class ChillParticle extends EtherParticle  {
-    protected ChillParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
+    protected ChillParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-        this.particleRed = 0.94f;
-        this.particleGreen = 0.99f;
-        this.particleBlue = 0.99f;
+        this.rCol = 0.94f;
+        this.gCol = 0.99f;
+        this.bCol = 0.99f;
         Random randy = new Random();
-        this.setMaxAge((int) (8.0d * randy.nextInt(15)));
+        this.setLifetime((int) (8.0d * randy.nextInt(15)));
         this.setMotion(xSpeedIn, ySpeedIn, zSpeedIn);
     }
     @OnlyIn(Dist.CLIENT)
@@ -39,9 +39,9 @@ public class ChillParticle extends EtherParticle  {
         }
 
         @Override
-        public Particle makeParticle(BasicParticleType typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             ChillParticle chillParticle = new ChillParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-            chillParticle.selectSpriteRandomly(this.spriteSet);
+            chillParticle.setSpriteFromAge(this.spriteSet);
             return chillParticle;
         }
     }

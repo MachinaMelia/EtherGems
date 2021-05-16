@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.util;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,9 +10,9 @@ package machinamelia.ethergems.common.util;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import java.util.UUID;
 
@@ -30,17 +30,17 @@ public final class MaxHealthHandler {
                 totalHealthModifier,
                 AttributeModifier.Operation.ADDITION
         );
-        IAttributeInstance attribute = maxHealthAttribute(player);
+        ModifiableAttributeInstance attribute = maxHealthAttribute(player);
         attribute.removeModifier(modifier);
-        attribute.applyModifier(modifier);
+        attribute.addTransientModifier(modifier);
 
         float newHealth = player.getHealth() * player.getMaxHealth() / oldMax;
         player.setHealth(1);
         player.setHealth(newHealth);
     }
 
-    private static IAttributeInstance maxHealthAttribute(PlayerEntity player) {
-        return player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+    private static ModifiableAttributeInstance maxHealthAttribute(PlayerEntity player) {
+        return player.getAttribute(Attributes.MAX_HEALTH);
     }
 
     private MaxHealthHandler() {}

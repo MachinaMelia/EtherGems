@@ -1,7 +1,7 @@
 package machinamelia.ethergems.client.screens;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.client.screens;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
@@ -52,10 +53,10 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
 
     public GemInventoryScreen(GemInventoryContainer screenContainer, PlayerInventory playerInventory, ITextComponent titleIn) {
         super(screenContainer, playerInventory, titleIn);
-        this.guiLeft = 0;
-        this.guiTop = 0;
-        this.xSize = 320;
-        this.ySize = 190;
+        this.leftPos = 0;
+        this.topPos = 0;
+        this.imageWidth = 320;
+        this.imageHeight = 190;
         this.player = playerInventory.player;
     }
 
@@ -63,11 +64,11 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
     @Override
     public void init() {
         super.init();
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         this.addButton(new ImageButton(x + 143, y + 7, 28, 29, 30, 2, 0, CRYSTAL_INVENTORY_UI_ELEMENTS, (onPressed) -> {
             this.crystalButtonPressed = true;
-            this.container.openGui();
+            this.getMenu().openGui();
             this.crystalButtonPressed = false;
         }));
         this.addButton(new ImageButton(x + 115, y + 7, 28, 32, 0, 32, 0, CRYSTAL_INVENTORY_UI_ELEMENTS, (onPressed) -> {
@@ -76,14 +77,14 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(final int mouseX, final int mouseY, final float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+    public void render(MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    public void renderBackground() {
-        super.renderBackground();
+    public void renderBackground(MatrixStack matrixStack) {
+        super.renderBackground(matrixStack);
     }
     @Override
     public boolean isPauseScreen() {
@@ -91,12 +92,12 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
     }
 
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+        super.slotClicked(slotIn, slotId, mouseButton, type);
         if (slotId >= 37) {
             UpdateGemEvents.updateServerPlayerGems(this.player, true);
-            if (this.player.world.isRemote) {
-                drawGuiContainerForegroundLayer(0, 0);
+            if (this.player.level.isClientSide) {
+//                renderLabels(matrixStack, 0, 0);
             }
         }
     }
@@ -104,30 +105,29 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        this.minecraft.getTextureManager().bindTexture(EQUIPMENT_INVENTORY_UI_ELEMENTS);
-        this.blit(35, 5, 0, 57, 64, 22);
-        Iterator<ItemStack> armorList = this.player.getArmorInventoryList().iterator();
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+        this.minecraft.getTextureManager().bind(EQUIPMENT_INVENTORY_UI_ELEMENTS);
+        this.blit(matrixStack, 35, 5, 0, 57, 64, 22);
+        Iterator<ItemStack> armorList = this.player.getArmorSlots().iterator();
         for (int i = 0; i < 4; i++) {
             ItemStack armor = armorList.next();
             LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
             ISlottedArmor armorInstance = armorCapability.orElse(new SlottedArmorInstance());
             if (!armor.getItem().equals(Items.AIR) && !armorInstance.equals(Items.AIR) && armorInstance.getSlots() > 0) {
-                this.minecraft.getTextureManager().bindTexture(EQUIPMENT_INVENTORY_UI_ELEMENTS);
-                this.blit(35, 27 + 20 * (3 - i), 0, 80, 64, 20);
-                this.minecraft.getTextureManager().bindTexture(EQUIPMENT_INVENTORY_UI_ELEMENTS);
-                this.blit(37, 28 + 20 * (3 - i), 0, 38, 18, 18);
+                this.minecraft.getTextureManager().bind(EQUIPMENT_INVENTORY_UI_ELEMENTS);
+                this.blit(matrixStack, 35, 27 + 20 * (3 - i), 0, 80, 64, 20);
+                this.minecraft.getTextureManager().bind(EQUIPMENT_INVENTORY_UI_ELEMENTS);
+                this.blit(matrixStack, 37, 28 + 20 * (3 - i), 0, 38, 18, 18);
             }
         }
-        ItemStack weapon = this.player.getHeldItemMainhand();
+        ItemStack weapon = this.player.getMainHandItem();
         if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
             LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
             ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
 
             for (int i = 0; i < weaponInstance.getSlots(); i++) {
-                this.minecraft.getTextureManager().bindTexture(EQUIPMENT_INVENTORY_UI_ELEMENTS);
-                this.blit(37 + 20 * i, 7, 0, 38, 18, 18);
+                this.minecraft.getTextureManager().bind(EQUIPMENT_INVENTORY_UI_ELEMENTS);
+                this.blit(matrixStack, 37 + 20 * i, 7, 0, 38, 18, 18);
             }
         }
         final String[] ATTRIBUTES = { "Bind Resist", "Blaze Attack", "Blaze Plus", "Buff Time Plus", "Chill Defence", "EXP Up", "Slow Resist", "Spike", "Strength Down", "Strength Up", "Weapon Power", "Aquatic Cloak", "Auto-Heal Up", "Damage Heal", "Debuff Resist", "HP Up", "HP Steal", "Poison Defence", "Recovery Up", "Spike Defence", "Unbeatable", "Back Attack Plus", "Double Attack", "First Attack Plus", "Phys Def Down", "Bind", "Blaze Defence", "Chill Attack", "Chill Plus", "Slow", "Aerial Cloak", "Bleed Attack", "Bleed Plus", "Fall Defence", "Good Footing", "Haste", "Quick Step", "Attack Stability", "Attack Plus", "Bleed Defence", "Critical Up", "Debuff Plus", "Earth Cloak", "Muscle Up", "Physical Protect", "Poison Attack", "Poison Plus" };
@@ -154,7 +154,7 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
                    strengthString  += "%";
                }
                String attributeColor = GemHandler.getColorCode(attribute);
-               this.font.drawString(attributeColor + attribute + attributeColor + ": " + colorCode + strengthString + colorCode, 2.0f, 121.0f + counter, 4210752);
+               this.font.draw(matrixStack, attributeColor + attribute + attributeColor + ": " + colorCode + strengthString + colorCode, 2.0f, 121.0f + counter, 4210752);
                counter += 8;
            }
         }
@@ -162,19 +162,19 @@ public class GemInventoryScreen extends ContainerScreen<GemInventoryContainer> {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         // Attribute display
-        this.minecraft.getTextureManager().bindTexture(ATTRIBUTE_DISPLAY_TEXTURE);
-        this.blit(x, y + 115, 0, 0, 112, 67);
+        this.minecraft.getTextureManager().bind(ATTRIBUTE_DISPLAY_TEXTURE);
+        this.blit(matrixStack, x, y + 115, 0, 0, 112, 67);
         // Crystal Inventory
-        this.minecraft.getTextureManager().bindTexture(EQUIPMENT_INVENTORY_TEXTURE);
-        this.blit(x + 7, y, 0, 0, 95, 120);
+        this.minecraft.getTextureManager().bind(EQUIPMENT_INVENTORY_TEXTURE);
+        this.blit(matrixStack, x + 7, y, 0, 0, 95, 120);
         // Crystal Inventory
-        this.minecraft.getTextureManager().bindTexture(CRYSTAL_INVENTORY_TEXTURE);
-        this.blit(x + 115, y + 35, 0, 0, 191, 120);
+        this.minecraft.getTextureManager().bind(CRYSTAL_INVENTORY_TEXTURE);
+        this.blit(matrixStack, x + 115, y + 35, 0, 0, 191, 120);
 
     }
 }

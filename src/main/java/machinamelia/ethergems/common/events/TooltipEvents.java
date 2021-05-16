@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -34,12 +34,12 @@ import machinamelia.ethergems.common.items.crystals.Crystal;
 import machinamelia.ethergems.common.items.cylinders.*;
 import machinamelia.ethergems.common.items.gems.Gem;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TooltipEvents {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void getTooltipEvent(ItemTooltipEvent event) {
-        if (event.getPlayer() != null && event.getPlayer().world.isRemote) {
+        if (event.getPlayer() != null && event.getPlayer().level.isClientSide) {
             Item item = event.getItemStack().getItem();
             ItemStack itemStack = event.getItemStack();
             if (item instanceof Crystal) {

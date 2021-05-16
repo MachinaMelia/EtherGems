@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -57,7 +57,7 @@ public class EtherFurnaceCraftingContainer  extends EtherFurnaceContainer {
         this.size = 44;
         this.attributes = new String[8];
         this.strengths = new int[8];
-        this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
+        this.canInteractWithCallable = IWorldPosCallable.create(tileEntity.getLevel(), tileEntity.getBlockPos());
         this.initSlots();
         this.initInventory();
     }
@@ -67,7 +67,7 @@ public class EtherFurnaceCraftingContainer  extends EtherFurnaceContainer {
     private static EtherFurnaceTileEntity getTileEntity(final PlayerInventory playerInventory, final PacketBuffer data) {
         Objects.requireNonNull(playerInventory, "playerInventory cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
-        final TileEntity tileAtPos = playerInventory.player.world.getTileEntity(data.readBlockPos());
+        final TileEntity tileAtPos = playerInventory.player.level.getBlockEntity(data.readBlockPos());
         if (tileAtPos instanceof EtherFurnaceTileEntity) {
             return (EtherFurnaceTileEntity) tileAtPos;
         }
@@ -219,14 +219,14 @@ public class EtherFurnaceCraftingContainer  extends EtherFurnaceContainer {
     }
 
     @Override
-    public void putStackInSlot(int slotID, ItemStack stack) {
-        this.getSlot(slotID).putStack(stack);
+    public void setItem(int slotID, ItemStack stack) {
+        this.getSlot(slotID).set(stack);
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
+    public void removed(PlayerEntity playerIn) {
         this.resetButtonCounter();
-        super.onContainerClosed(playerIn);
+        super.removed(playerIn);
     }
 
 }

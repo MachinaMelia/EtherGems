@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.init;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -19,7 +19,7 @@ import machinamelia.ethergems.common.EtherGems;
 
 public class ParticleInit {
 
-    public static final DeferredRegister<ParticleType<?>> PARTICLES = new DeferredRegister<>(ForgeRegistries.PARTICLE_TYPES, EtherGems.MOD_ID);
+    public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, EtherGems.MOD_ID);
 
     // Particles
     public static final RegistryObject<BasicParticleType> FIRE_ETHER_PARTICLE = PARTICLES.register("fire_ether_particle", () -> new BasicParticleType(true));

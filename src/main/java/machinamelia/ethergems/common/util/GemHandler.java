@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.util;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -1335,35 +1335,15 @@ public class GemHandler {
     }
     public static double getPlayerGemStrength(PlayerEntity player, String attribute) {
         double fullStrength = 0;
-        Iterator<ItemStack> armorList = player.getArmorInventoryList().iterator();
-        for (int i = 0; i < 4; i++) {
-            ItemStack armor = armorList.next();
-            LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-            try {
-                ISlottedArmor armorInstance = armorCapability.orElseThrow(IllegalStateException::new);
-                ItemStack gem = armorInstance.getGem();
-                if (gem != null && gem.getItem() instanceof Gem && !gem.getItem().equals(Items.AIR)) {
-                    LazyOptional<IGem> gemCapability = gem.getCapability(GemProvider.GEM_CAPABILITY);
-                    IGem gemInstance = gemCapability.orElseThrow(IllegalStateException::new);
-                    String gemAttribute = gemInstance.getAttribute();
-                    double strength = gemInstance.getStrength();
-                    if (gemAttribute != null && !gemAttribute.equals("")) {
-                        if (gemAttribute.equals(attribute)) {
-                            fullStrength += strength;
-                        }
-                    }
-                }
-            } catch (IllegalStateException e) {
-            }
-        }
-        if (player.world.isRemote) {
-            ItemStack weapon = player.getHeldItemMainhand();
-            if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
-                LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
+        if (player.level.isClientSide) {
+            Iterator<ItemStack> armorList = player.getArmorSlots().iterator();
+            for (int i = 0; i < 4; i++) {
+                ItemStack armor = armorList.next();
+                LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
                 try {
-                    ISlottedWeapon weaponInstance = weaponCapability.orElseThrow(IllegalStateException::new);
-                    for (int i = 0; i < weaponInstance.getSlots(); i++) {
-                        ItemStack gem = weaponInstance.getGem(i);
+                    ISlottedArmor armorInstance = armorCapability.orElseThrow(IllegalStateException::new);
+                    if (armorInstance.getSlots() > 0) {
+                        ItemStack gem = armorInstance.getGem();
                         if (gem != null && gem.getItem() instanceof Gem && !gem.getItem().equals(Items.AIR)) {
                             LazyOptional<IGem> gemCapability = gem.getCapability(GemProvider.GEM_CAPABILITY);
                             IGem gemInstance = gemCapability.orElseThrow(IllegalStateException::new);
@@ -1387,7 +1367,60 @@ public class GemHandler {
                 ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
                 readItemStacksFromTag(items, listNBT);
             }
-            ItemStack weapon = player.getHeldItemMainhand();
+            Iterator<ItemStack> armorList = player.getArmorSlots().iterator();
+
+            for (int i = 0; i < 4; i++) {
+                ItemStack armor = armorList.next();
+                LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
+                try {
+                    ISlottedArmor armorInstance = armorCapability.orElseThrow(IllegalStateException::new);
+                    if (armorInstance.getSlots() > 0) {
+                        if (items[37 + i] != null && items[37 + i].getItem() instanceof Gem) {
+                            LazyOptional<IGem> gemCapability = items[37 + i].getCapability(GemProvider.GEM_CAPABILITY);
+                            IGem gemInstance = gemCapability.orElseThrow(IllegalStateException::new);
+                            String gemAttribute = gemInstance.getAttribute();
+                            double strength = gemInstance.getStrength();
+                            if (gemAttribute != null && !gemAttribute.equals("")) {
+                                if (gemAttribute.equals(attribute)) {
+                                    fullStrength += strength;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (IllegalStateException e) {
+                }
+            }
+        }
+        if (player.level.isClientSide) {
+            ItemStack weapon = player.getMainHandItem();
+            if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
+                LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
+                ISlottedWeapon weaponInstance = weaponCapability.orElseThrow(IllegalStateException::new);
+                for (int i = 0; i < weaponInstance.getSlots(); i++) {
+                    ItemStack gem = weaponInstance.getGem(i);
+                    if (gem != null && gem.getItem() instanceof Gem && !gem.getItem().equals(Items.AIR)) {
+                        LazyOptional<IGem> gemCapability = gem.getCapability(GemProvider.GEM_CAPABILITY);
+                        IGem gemInstance = gemCapability.orElseThrow(IllegalStateException::new);
+                        String gemAttribute = gemInstance.getAttribute();
+                        double strength = gemInstance.getStrength();
+                        if (gemAttribute != null && !gemAttribute.equals("")) {
+                            if (gemAttribute.equals(attribute)) {
+                                fullStrength += strength;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            CompoundNBT compoundNBT = (CompoundNBT) player.getPersistentData().get("gem_inventory");
+            ItemStack[] items = new ItemStack[44];
+            if (compoundNBT != null) {
+                ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
+                readItemStacksFromTag(items, listNBT);
+            }
+            ItemStack weapon = player.getMainHandItem();
             if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 try {

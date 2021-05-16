@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FoodEvents {
     public static final Field saturationLevel = ObfuscationReflectionHelper.findField(FoodStats.class, "field_75125_b");
     @SubscribeEvent
@@ -34,11 +34,11 @@ public class FoodEvents {
             if (fullStrength > 25.0) {
                 fullStrength = 25.0;
             }
-            if (event.getItem().isFood() && fullStrength > 0) {
-                float currentSaturation = player.getFoodStats().getSaturationLevel();
-                FoodStats food = player.getFoodStats();
+            if (event.getItem().isEdible() && fullStrength > 0) {
+                float currentSaturation = player.getFoodData().getSaturationLevel();
+                FoodStats food = player.getFoodData();
                 try {
-                    saturationLevel.set(food, currentSaturation + (float) (event.getItem().getItem().getFood().getSaturation() * (fullStrength / 100.0)));
+                    saturationLevel.set(food, currentSaturation + (float) (event.getItem().getItem().getFoodProperties().getSaturationModifier() * (fullStrength / 100.0)));
                 } catch (IllegalAccessException e) {
                     LOGGER.warn("IllegalAccessException using reflection on PlayerEntity saturationLevel: " + e);
                 }

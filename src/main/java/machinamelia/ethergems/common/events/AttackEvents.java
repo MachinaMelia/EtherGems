@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,7 +10,9 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.network.client.RenderParticleOnClientMessage;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
@@ -25,7 +27,6 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -44,7 +45,7 @@ import machinamelia.ethergems.common.util.GemHandler;
 
 import java.util.Random;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AttackEvents {
 
     private static int doubleAttackTickCounter = 65;
@@ -52,14 +53,14 @@ public class AttackEvents {
 
     @SubscribeEvent
     public static void checkDoubleAttack(TickEvent.PlayerTickEvent event) {
-        if (event.player != null && event.player.world.isRemote) {
+        if (event.player != null && event.player.level.isClientSide) {
             if (engagement[0] != null && engagement[1] != null && event.player != null && engagement[0] instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) event.player;
-                if (player.getUniqueID().equals(event.player.getUniqueID())) {
+                if (player.getUUID().equals(event.player.getUUID())) {
                     if (doubleAttackTickCounter > 0) {
                         doubleAttackTickCounter--;
                     } else {
-                        SendDoubleAttackToServerMessage doubleAttackToServerMessage = new SendDoubleAttackToServerMessage(engagement[1].getEntityId());
+                        SendDoubleAttackToServerMessage doubleAttackToServerMessage = new SendDoubleAttackToServerMessage(engagement[1].getId());
                         NetworkHandler.simpleChannel.sendToServer(doubleAttackToServerMessage);
                         attack(player, engagement[1]);
                         engagement[0] = null;
@@ -81,11 +82,11 @@ public class AttackEvents {
     }
 
     public static void attack(PlayerEntity player, LivingEntity target) {
-        if (player.world.isRemote) {
+        if (player.level.isClientSide) {
             UpdateGemEvents.updateServerPlayerGems(player, false);
         }
 
-        Item item = player.getHeldItemMainhand().getItem();
+        Item item = player.getMainHandItem().getItem();
         double strengthUp = GemHandler.getPlayerGemStrength(player, "Strength Up");
         if (strengthUp > 4.5) {
             strengthUp = 4.5;
@@ -99,8 +100,10 @@ public class AttackEvents {
                     firstAttack = 5.0;
                 }
             }
-            float playerYaw = player.getYaw((float) 2.0);
-            float targetYaw = target.getYaw((float) 4.0);
+            float playerYaw = player.getViewYRot((float) 2.0);
+            float targetYaw = target.getViewYRot((float) 4.0);
+            System.out.println("playerYaw: " + playerYaw);
+            System.out.println("targetYaw: " + targetYaw);
             playerYaw = normalizeAngle(playerYaw);
             targetYaw = normalizeAngle(targetYaw);
             float lowerRange = playerYaw - 75;
@@ -113,45 +116,54 @@ public class AttackEvents {
                 if (backAttack > 4.5) {
                     backAttack = 4.5;
                 }
-                double d0 = (double) (-MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)));
-                double d1 = (double) MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F));
-                if (player.world instanceof ServerWorld && backAttack > 0) {
-                    ((ServerWorld) player.world).spawnParticle(ParticleInit.BACK_ATTACK.get(), player.getPosX() + d0, player.getPosYHeight(0.5D), player.getPosZ() + d1, 0, d0, 0.0D, d1, 0.0D);
+                System.out.println("Is Back Attack!");
+                double d0 = (double) (-MathHelper.sin(player.yRot * ((float) Math.PI / 180F)));
+                double d1 = (double) MathHelper.cos(player.yRot * ((float) Math.PI / 180F));
+                if (player.level.isClientSide && backAttack > 0) {
+                    ClientWorld world = (ClientWorld) player.level;
+                    world.addParticle(ParticleInit.BACK_ATTACK.get(), true, player.getX() + d0, player.getY(0.5D), player.getZ() + d1, d0, d1, 0.0f);
+                } else if (backAttack > 0) {
+                    ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                    RenderParticleOnClientMessage msg = new RenderParticleOnClientMessage(serverPlayer.getStringUUID(), 2, (float) (player.getX() + d0), (float) (player.getY(0.5D)), (float) (player.getZ() + d1), (float) d0, (float) d1, (float) 0.0D, 0);
+                    NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
             int physDefDown = 0;
-            if (target.getActivePotionEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get()) != null) {
-                EffectInstance physDefDownInstance = target.getActivePotionEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get());
+            if (target.getEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get()) != null) {
+                EffectInstance physDefDownInstance = target.getEffect(EffectInit.PHYS_DEF_DOWN_EFFECT.get());
                 physDefDown = physDefDownInstance.getAmplifier();
             }
             float weaponBaseDamage = 0;
             if (item instanceof SwordItem) {
                 SwordItem sword = (SwordItem) item;
-                weaponBaseDamage = sword.getAttackDamage();
+                weaponBaseDamage = sword.getDamage();
             } else if (item instanceof SlottedAxe) {
                 SlottedAxe axe = (SlottedAxe) item;
                 weaponBaseDamage = axe.getAttackDamage();
             }
-
-
             double fullStrength = GemHandler.getPlayerGemStrength(player, "Critical Up");
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (player.world.isRemote && roll < fullStrength) {
-                player.world.playSound((PlayerEntity) null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0F, 1.0F);
+            if (!player.level.isClientSide && roll < fullStrength) {
+                player.level.playSound((PlayerEntity) null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
                 ClientPlayerEntity clientPlayer = (ClientPlayerEntity) player;
-                clientPlayer.onCriticalHit(target);
+                clientPlayer.crit(target);
+                System.out.println("Crit animation!");
             }
             if (roll < fullStrength) {
+                System.out.println("Is Crit: " + roll + ", " + fullStrength);
+                System.out.println("Back Attack: " + backAttack);
                 net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, target, true, true ? 1.5F : 1.0F);
-                target.attackEntityFrom(DamageSource.causePlayerDamage(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) * 1.5F - target.getTotalArmorValue() + (float) (physDefDown * 0.5));
+                target.hurt(DamageSource.playerAttack(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) * 1.5F - target.getArmorValue() + (float) (physDefDown * 0.5));
             } else {
-                target.attackEntityFrom(DamageSource.causePlayerDamage(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) - target.getTotalArmorValue() + (float) (physDefDown * 0.5));
+                System.out.println("Not Crit: " + roll + ", " + fullStrength);
+                System.out.println("Back Attack: " + backAttack);
+                target.hurt(DamageSource.playerAttack(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) - target.getArmorValue() + (float) (physDefDown * 0.5));
             }
         }
         if (target instanceof PlayerEntity) {
             PlayerEntity targetPlayer = (PlayerEntity) target;
-            if (player.world.isRemote) {
+            if (player.level.isClientSide) {
                 UpdateGemEvents.updateServerPlayerGems(player, false);
             }
             double fullStrength = GemHandler.getPlayerGemStrength(targetPlayer, "Spike");
@@ -163,9 +175,9 @@ public class AttackEvents {
                 resistStrength = 100.0;
             }
             if (fullStrength > 0.0 && resistStrength == 0.0) {
-                player.attackEntityFrom(DamageSource.causeThornsDamage(targetPlayer), (float) (fullStrength));
+                player.hurt(DamageSource.thorns(targetPlayer), (float) (fullStrength));
             } else if (fullStrength > 0.0) {
-                player.attackEntityFrom(DamageSource.causeThornsDamage(targetPlayer), (float) (fullStrength - (fullStrength * (resistStrength / 100.0))));
+                player.hurt(DamageSource.thorns(targetPlayer), (float) (fullStrength - (fullStrength * (resistStrength / 100.0))));
             }
         }
         double fullStrength = GemHandler.getPlayerGemStrength(player, "Blaze Plus");
@@ -215,7 +227,7 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower) {
-                target.setFire(6 + (int) (6 * (debuffPlus / 100.0)));
+                target.setSecondsOnFire(6 + (int) (6 * (debuffPlus / 100.0)));
             }
         }
         fullStrength = GemHandler.getPlayerGemStrength(player, "Chill Attack");
@@ -230,10 +242,10 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
-                target.addPotionEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
-                if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+                target.addEffect(new EffectInstance(EffectInit.CHILL_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
+                if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.CHILL_EFFECT.get().getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), EffectInit.CHILL_EFFECT.get().getDescriptionId(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
@@ -250,10 +262,10 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
-                target.addPotionEffect(new EffectInstance(EffectInit.BLEED_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
-                if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+                target.addEffect(new EffectInstance(EffectInit.BLEED_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0))));
+                if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.BLEED_EFFECT.get().getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), EffectInit.BLEED_EFFECT.get().getDescriptionId(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
@@ -274,10 +286,10 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
-                target.addPotionEffect(new EffectInstance(Effects.POISON, 160 + (int) (160 * (debuffPlus / 100.0)), (int) Math.ceil(poisonPlus)));
-                if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+                target.addEffect(new EffectInstance(Effects.POISON, 160 + (int) (160 * (debuffPlus / 100.0)), (int) Math.ceil(poisonPlus)));
+                if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), Effects.POISON.getName(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) poisonPlus);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), Effects.POISON.getDescriptionId(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) poisonPlus);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
@@ -286,6 +298,10 @@ public class AttackEvents {
         if (fullStrength > 25.0) {
             fullStrength = 25.0;
         }
+        double bindResist = GemHandler.getPlayerGemStrength(player, "Bind Resist");
+        if (bindResist > 100.0) {
+            bindResist = 100.0;
+        }
         weaponPower = GemHandler.getPlayerGemStrength(player, "Weapon Power");
         if (weaponPower > 50.0) {
             weaponPower = 50.0;
@@ -293,11 +309,12 @@ public class AttackEvents {
         if (fullStrength > 0 && (!(target instanceof EndermanEntity || target instanceof EndermiteEntity))) {
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
-                target.addPotionEffect(new EffectInstance(EffectInit.BIND_EFFECT.get(), 60 + (int) (40 * (debuffPlus / 100.0))));
-                if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+            int bindRoll = randy.nextInt(100);
+            if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist) && !(bindRoll < bindResist)) {
+                target.addEffect(new EffectInstance(EffectInit.BIND_EFFECT.get(), 60 + (int) (40 * (debuffPlus / 100.0))));
+                if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.BIND_EFFECT.get().getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 0);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), EffectInit.BIND_EFFECT.get().getDescriptionId(), 60 + (int) (40 * (debuffPlus / 100.0)), 0);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
@@ -314,10 +331,10 @@ public class AttackEvents {
             Random randy = new Random();
             int roll = randy.nextInt(100);
             if (roll < fullStrength + weaponPower && !(debuffRoll < debuffResist)) {
-                target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 100 + (int) (80 * (debuffPlus / 100.0)), 2));
-                if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+                target.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 100 + (int) (80 * (debuffPlus / 100.0)), 2));
+                if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                     ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), Effects.SLOWNESS.getName(), 80 + (int) (80 * (debuffPlus / 100.0)), 2);
+                    SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), Effects.MOVEMENT_SLOWDOWN.getDescriptionId(), 80 + (int) (80 * (debuffPlus / 100.0)), 2);
                     NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                 }
             }
@@ -327,10 +344,10 @@ public class AttackEvents {
             fullStrength = -3.0;
         }
         if (fullStrength < 0 && (!(target instanceof MagmaCubeEntity || target instanceof SlimeEntity)) && !(debuffRoll < debuffResist)) {
-            target.addPotionEffect(new EffectInstance(EffectInit.STRENGTH_DOWN_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0)), (int) -(fullStrength / 0.5)));
-            if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+            target.addEffect(new EffectInstance(EffectInit.STRENGTH_DOWN_EFFECT.get(), 80 + (int) (80 * (debuffPlus / 100.0)), (int) -(fullStrength / 0.5)));
+            if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.STRENGTH_DOWN_EFFECT.get().getName(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) -(fullStrength / 0.5));
+                SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID(), EffectInit.STRENGTH_DOWN_EFFECT.get().getDescriptionId(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) -(fullStrength / 0.5));
                 NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
             }
         }
@@ -339,10 +356,10 @@ public class AttackEvents {
             fullStrength = 5.0;
         }
         if (fullStrength > 0 && (!(target instanceof IronGolemEntity || target instanceof RavagerEntity)) && !(debuffRoll < debuffResist)) {
-            target.addPotionEffect(new EffectInstance(EffectInit.PHYS_DEF_DOWN_EFFECT.get(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) (fullStrength / 0.5)));
-            if (!player.world.isRemote && target instanceof ServerPlayerEntity) {
+            target.addEffect(new EffectInstance(EffectInit.PHYS_DEF_DOWN_EFFECT.get(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) (fullStrength / 0.5)));
+            if (!player.level.isClientSide && target instanceof ServerPlayerEntity) {
                 ServerPlayerEntity serverPlayer = (ServerPlayerEntity) target;
-                SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getUniqueID().toString(), EffectInit.PHYS_DEF_DOWN_EFFECT.get().getName(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) (fullStrength / 0.5));
+                SendPotionEffectToClientMessage msg = new SendPotionEffectToClientMessage(serverPlayer.getStringUUID().toString(), EffectInit.PHYS_DEF_DOWN_EFFECT.get().getDescriptionId(), 160 + (int) (160 * (debuffPlus / 100.0)), (int) (fullStrength / 0.5));
                 NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
             }
         }
@@ -376,7 +393,7 @@ public class AttackEvents {
     @SubscribeEvent
     public static void attackEvent(AttackEntityEvent event) {
         PlayerEntity player = event.getPlayer();
-        Item item = player.getHeldItemMainhand().getItem();
+        Item item = player.getMainHandItem().getItem();
 
         if (item instanceof SwordItem) {
             SwordItem sword = (SwordItem) item;
@@ -395,7 +412,7 @@ public class AttackEvents {
                 buffTimePlus = 150.0;
             }
             if (fullStrength > 0) {
-                player.addPotionEffect(new EffectInstance(EffectInit.PHYSICAL_PROTECT_EFFECT.get(), 120 + (int) (120 * (buffTimePlus / 100.0)), (int) (fullStrength / 0.5)));
+                player.addEffect(new EffectInstance(EffectInit.PHYSICAL_PROTECT_EFFECT.get(), 120 + (int) (120 * (buffTimePlus / 100.0)), (int) (fullStrength / 0.5)));
             }
             player.getPersistentData().putInt("physical_protect_time", 360);
         }
@@ -423,7 +440,7 @@ public class AttackEvents {
 
     @SubscribeEvent
     public static void enemyAttackEvent(LivingAttackEvent event) {
-        Entity source = event.getSource().getTrueSource();
+        Entity source = event.getSource().getEntity();
         LivingEntity target = event.getEntityLiving();
         if (target instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) target;
@@ -435,9 +452,9 @@ public class AttackEvents {
                 }
                 double resistStrength = 0;
                 if (!(livingSource instanceof PlayerEntity) && fullStrength > 0) {
-                    livingSource.attackEntityFrom(DamageSource.causeThornsDamage(player), (float) fullStrength);
+                    livingSource.hurt(DamageSource.thorns(player), (float) fullStrength);
                 }
-                if (!(livingSource instanceof PlayerEntity) && event.getSource().damageType.equals("thorns")) {
+                if (!(livingSource instanceof PlayerEntity) && event.getSource().msgId.equals("thorns")) {
                     resistStrength = GemHandler.getPlayerGemStrength(player, "Spike Defence");
                     if (resistStrength > 100.0) {
                         resistStrength = 100.0;

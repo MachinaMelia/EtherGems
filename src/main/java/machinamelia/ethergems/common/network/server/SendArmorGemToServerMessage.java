@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.network.server;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -41,7 +41,7 @@ public class SendArmorGemToServerMessage {
     public static SendArmorGemToServerMessage decode(PacketBuffer buf)
     {
         boolean isCompatible = buf.readBoolean();
-        ItemStack armorGem = buf.readItemStack();
+        ItemStack armorGem = buf.readItem();
         int index = buf.readInt();
         SendArmorGemToServerMessage retval = new SendArmorGemToServerMessage(armorGem, index, isCompatible);
         retval.messageIsValid = true;
@@ -51,7 +51,7 @@ public class SendArmorGemToServerMessage {
     public void encode(PacketBuffer buf)
     {
         buf.writeBoolean(isCompatible);
-        buf.writeItemStack(armorGem);
+        buf.writeItemStack(armorGem, true);
         buf.writeInt(index);
     }
 

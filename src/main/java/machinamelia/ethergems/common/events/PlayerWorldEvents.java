@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -20,9 +20,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -43,7 +45,7 @@ import java.util.Random;
 
 import static machinamelia.ethergems.common.container.EtherFurnaceContainer.writeItemStacksToTag;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlayerWorldEvents {
 
     private static int crystalLevel = 0;
@@ -54,20 +56,23 @@ public class PlayerWorldEvents {
         return crystalLevel;
     }
 
+    public static final ResourceLocation CRYSTAL_LEVEL_CAPABILITY = new ResourceLocation(EtherGems.MOD_ID, "crystal_level");
+
     @SubscribeEvent
     public static void getAdvancements(AdvancementEvent event) {
         Advancement advancement = event.getAdvancement();
         ServerPlayerEntity advancedPlayer = (ServerPlayerEntity) event.getPlayer();
-        List<ServerPlayerEntity> players = advancedPlayer.getServerWorld().getPlayers();
+        List<? extends PlayerEntity> players = advancedPlayer.getCommandSenderWorld().players();
         if (crystalLevel < 1 && (advancement.getId().toString().equals("minecraft:story/lava_bucket") || advancement.getId().toString().equals("minecraft:story/mine_diamond"))) {
             System.out.println("Level II Crystals are now available");
             setCrystalLevel(1);
-            for (ServerPlayerEntity player : players) {
-                player.sendMessage(new StringTextComponent("Level II Crystals are now available"));
-                player.getPersistentData().putInt("crystal_level", crystalLevel);
-                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
-                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
-                ServerWorld world = player.getServerWorld();
+            for (PlayerEntity player : players) {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                serverPlayer.sendMessage(new StringTextComponent("Level II Crystals are now available"), serverPlayer.getUUID());
+                serverPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
+                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(serverPlayer.getStringUUID(), crystalLevel);
+                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                World world = serverPlayer.getCommandSenderWorld();
                 LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
                 ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
                 crystalLevelInstance.setCrystalLevel(crystalLevel);
@@ -75,12 +80,13 @@ public class PlayerWorldEvents {
         } else if (crystalLevel < 2 && advancement.getId().toString().equals("minecraft:nether/obtain_blaze_rod")) {
             System.out.println("Level III Crystals are now available");
             setCrystalLevel(2);
-            for (ServerPlayerEntity player : players) {
-                player.sendMessage(new StringTextComponent("Level III Crystals are now available"));
-                player.getPersistentData().putInt("crystal_level", crystalLevel);
-                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
-                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
-                ServerWorld world = player.getServerWorld();
+            for (PlayerEntity player : players) {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                serverPlayer.sendMessage(new StringTextComponent("Level III Crystals are now available"), serverPlayer.getUUID());
+                serverPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
+                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(serverPlayer.getStringUUID(), crystalLevel);
+                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                World world = serverPlayer.getCommandSenderWorld();
                 LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
                 ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
                 crystalLevelInstance.setCrystalLevel(crystalLevel);
@@ -88,12 +94,13 @@ public class PlayerWorldEvents {
         } else if (crystalLevel < 3 && advancement.getId().toString().equals("minecraft:story/follow_ender_eye")) {
             System.out.println("Level IV Crystals are now available");
             setCrystalLevel(3);
-            for (ServerPlayerEntity player : players) {
-                player.sendMessage(new StringTextComponent("Level IV Crystals are now available"));
-                player.getPersistentData().putInt("crystal_level", crystalLevel);
-                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
-                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
-                ServerWorld world = player.getServerWorld();
+            for (PlayerEntity player : players) {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                serverPlayer.sendMessage(new StringTextComponent("Level IV Crystals are now available"), serverPlayer.getUUID());
+                serverPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
+                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(serverPlayer.getStringUUID(), crystalLevel);
+                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                World world = serverPlayer.getCommandSenderWorld();
                 LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
                 ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
                 crystalLevelInstance.setCrystalLevel(crystalLevel);
@@ -101,12 +108,13 @@ public class PlayerWorldEvents {
         } else if (crystalLevel < 4 && advancement.getId().toString().equals("minecraft:end/kill_dragon")) {
             System.out.println("Level V Crystals are now available");
             setCrystalLevel(4);
-            for (ServerPlayerEntity player : players) {
-                player.sendMessage(new StringTextComponent("Level V Crystals are now available"));
-                player.getPersistentData().putInt("crystal_level", crystalLevel);
-                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
-                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
-                ServerWorld world = player.getServerWorld();
+            for (PlayerEntity player : players) {
+                ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+                serverPlayer.sendMessage(new StringTextComponent("Level V Crystals are now available"), serverPlayer.getUUID());
+                serverPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
+                SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(serverPlayer.getStringUUID(), crystalLevel);
+                NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                World world = serverPlayer.getCommandSenderWorld();
                 LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
                 ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
                 crystalLevelInstance.setCrystalLevel(crystalLevel);
@@ -117,21 +125,21 @@ public class PlayerWorldEvents {
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         // Allow equipment to get gems on respawn by opening and closing the gem inventory
-        if (!event.getPlayer().world.isRemote) {
+        if (!event.getPlayer().level.isClientSide) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
-            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.doCloseContainer();
             serverPlayer.closeContainer();
-            serverPlayer.closeScreen();
         }
     }
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        if (!event.getPlayer().world.isRemote) {
+        if (!event.getPlayer().level.isClientSide) {
             ServerPlayerEntity orignalPlayer = (ServerPlayerEntity) event.getOriginal();
             ServerPlayerEntity newPlayer = (ServerPlayerEntity) event.getPlayer();
 
-            ServerWorld world = newPlayer.getServerWorld();
+            World world = newPlayer.getCommandSenderWorld();
 
             LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
             ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
@@ -150,9 +158,9 @@ public class PlayerWorldEvents {
 
             // Allow equipment to get gems on respawn by opening and closing the gem inventory
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
-            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.doCloseContainer();
             serverPlayer.closeContainer();
-            serverPlayer.closeScreen();
 
             newPlayer.getPersistentData().putInt("crystal_level", crystalLevel);
             newPlayer.getPersistentData().putBoolean("secondAttack", false);
@@ -192,9 +200,9 @@ public class PlayerWorldEvents {
 
     @SubscribeEvent
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (!event.getPlayer().world.isRemote) {
+        if (!event.getPlayer().level.isClientSide) {
             ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
-            SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
+            SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getStringUUID(), crystalLevel);
             NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
         }
     }
@@ -219,24 +227,24 @@ public class PlayerWorldEvents {
         }
         compoundNBT = (CompoundNBT) event.getPlayer().getPersistentData().get("armor_slots");
         if (compoundNBT == null) {
-            NonNullList<ItemStack> armorInventory = event.getPlayer().inventory.armorInventory;
+            NonNullList<ItemStack> armorInventory = event.getPlayer().inventory.armor;
             compoundNBT = new CompoundNBT();
-            compoundNBT.putBoolean("Head", event.getPlayer().inventory.armorInventory.get(0).getItem() != null);
-            compoundNBT.putBoolean("Chest", event.getPlayer().inventory.armorInventory.get(1).getItem() != null);
-            compoundNBT.putBoolean("Legs", event.getPlayer().inventory.armorInventory.get(2).getItem() != null);
-            compoundNBT.putBoolean("Feet", event.getPlayer().inventory.armorInventory.get(3).getItem() != null);
+            compoundNBT.putBoolean("Head", event.getPlayer().inventory.armor.get(0).getItem() != null);
+            compoundNBT.putBoolean("Chest", event.getPlayer().inventory.armor.get(1).getItem() != null);
+            compoundNBT.putBoolean("Legs", event.getPlayer().inventory.armor.get(2).getItem() != null);
+            compoundNBT.putBoolean("Feet", event.getPlayer().inventory.armor.get(3).getItem() != null);
             event.getPlayer().getPersistentData().put("armor_slots", compoundNBT);
         }
         // Allow equipment to get gems on respawn by opening and closing the gem inventory
-        if (!event.getPlayer().world.isRemote) {
+        if (!event.getPlayer().level.isClientSide) {
             ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.getPlayer();
-            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            NetworkHooks.openGui(serverPlayer , new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, serverPlayer)));
+            serverPlayer.doCloseContainer();
             serverPlayer.closeContainer();
-            serverPlayer.closeScreen();
         }
-        if (!event.getPlayer().world.isRemote) {
+        if (!event.getPlayer().level.isClientSide) {
             ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
-            ServerWorld world = player.getServerWorld();
+            World world = player.getCommandSenderWorld();
             LazyOptional<ICrystalLevel> crystalLevelCapability = world.getCapability(CrystalLevelProvider.CRYSTAL_LEVEL_CAPABILITY);
             ICrystalLevel crystalLevelInstance = crystalLevelCapability.orElse(new CrystalLevelInstance());
             setCrystalLevel(crystalLevelInstance.getCrystalLevel());
@@ -254,7 +262,7 @@ public class PlayerWorldEvents {
             player.getPersistentData().putInt("bleed_time", 0);
             player.getPersistentData().putInt("physical_protect_time", 360);
             player.getPersistentData().putString("remove_debuff", "");
-            SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getUniqueID().toString(), crystalLevel);
+            SendAffinityToClientPlayer msg = new SendAffinityToClientPlayer(player.getStringUUID().toString(), crystalLevel);
             NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
         }
     }
@@ -277,5 +285,9 @@ public class PlayerWorldEvents {
                 }
             }
         }
+    }
+    @SubscribeEvent
+    public static void onAttachWorldCapabilities(final AttachCapabilitiesEvent<World> event) {
+        event.addCapability(CRYSTAL_LEVEL_CAPABILITY, new CrystalLevelProvider());
     }
 }

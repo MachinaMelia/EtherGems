@@ -36,20 +36,19 @@ import java.util.Random;
 import static machinamelia.ethergems.common.container.EtherFurnaceContainer.readItemStacksFromTag;
 import static machinamelia.ethergems.common.container.EtherFurnaceContainer.writeItemStacksToTag;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlayerUpdateEvents {
     @SubscribeEvent
     public static void playerUpdateEvent(PlayerEvent event) {
         if (event.getPlayer() != null) {
-            if (event.getPlayer().inventory != null && event.getPlayer().inventory.mainInventory != null) {
+            if (event.getPlayer().inventory != null && event.getPlayer().inventory.items != null) {
                 PlayerInventory inventory = event.getPlayer().inventory;
-                for (int i = 0; i < inventory.getSizeInventory(); i++) {
-                    if (inventory.getStackInSlot(i).getItem() instanceof Cylinder) {
+                for (int i = 0; i < inventory.getContainerSize(); i++) {
+                    if (inventory.getItem(i).getItem() instanceof Cylinder) {
                         if (event instanceof InputUpdateEvent || event instanceof PlayerEvent.ItemPickupEvent) {
                             ItemStack[] cylinders = new ItemStack[1];
-                            cylinders[0] = inventory.getStackInSlot(i);
-                            if (event.getPlayer().world.isRemote) {
+                            cylinders[0] = inventory.getItem(i);
+                            if (event.getPlayer().level.isClientSide) {
                                 PutCrystalsInInventoryMessage putCrystalsInInventoryMessage = new PutCrystalsInInventoryMessage(cylinders);
                                 NetworkHandler.simpleChannel.sendToServer(putCrystalsInInventoryMessage);
                             } else {
@@ -79,10 +78,10 @@ public class PlayerUpdateEvents {
                                 }
                             }
                         }
-                        inventory.setInventorySlotContents(i, ItemStack.EMPTY);
-                    } else if (inventory.getStackInSlot(i).getItem() instanceof Crystal) {
+                        inventory.setItem(i, ItemStack.EMPTY);
+                    } else if (inventory.getItem(i).getItem() instanceof Crystal) {
                         if (event instanceof InputUpdateEvent || event instanceof PlayerEvent.ItemPickupEvent) {
-                            ItemStack itemStack = inventory.getStackInSlot(i);
+                            ItemStack itemStack = inventory.getItem(i);
                             LazyOptional<ICrystal> crystalCapability = itemStack.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
                             ICrystal crystalImpl = crystalCapability.orElse(new CrystalInstance());
                             Random randy = new Random();
@@ -108,8 +107,8 @@ public class PlayerUpdateEvents {
                             }
                             crystalImpl.init();
                             ItemStack[] crystals = new ItemStack[1];
-                            crystals[0] = inventory.getStackInSlot(i);
-                            if (event.getPlayer().world.isRemote) {
+                            crystals[0] = inventory.getItem(i);
+                            if (event.getPlayer().level.isClientSide) {
                                 PutCrystalsInInventoryMessage putCrystalsInInventoryMessage = new PutCrystalsInInventoryMessage(crystals);
                                 NetworkHandler.simpleChannel.sendToServer(putCrystalsInInventoryMessage);
                             } else {
@@ -140,12 +139,12 @@ public class PlayerUpdateEvents {
                             }
 
                         }
-                        inventory.setInventorySlotContents(i, ItemStack.EMPTY);
-                    } else if (inventory.getStackInSlot(i).getItem() instanceof Gem) {
+                        inventory.setItem(i, ItemStack.EMPTY);
+                    } else if (inventory.getItem(i).getItem() instanceof Gem) {
                         if (event instanceof InputUpdateEvent || event instanceof PlayerEvent.ItemPickupEvent) {
                             ItemStack[] gems = new ItemStack[1];
-                            gems[0] = inventory.getStackInSlot(i);
-                            if (event.getPlayer().world.isRemote) {
+                            gems[0] = inventory.getItem(i);
+                            if (event.getPlayer().level.isClientSide) {
                                 PutGemsInInventoryMessage putGemsInInventoryMessage = new PutGemsInInventoryMessage(gems);
                                 NetworkHandler.simpleChannel.sendToServer(putGemsInInventoryMessage);
                             } else {
@@ -175,7 +174,7 @@ public class PlayerUpdateEvents {
                                 }
                             }
                         }
-                        inventory.setInventorySlotContents(i, ItemStack.EMPTY);
+                        inventory.setItem(i, ItemStack.EMPTY);
                     }
 
                 }

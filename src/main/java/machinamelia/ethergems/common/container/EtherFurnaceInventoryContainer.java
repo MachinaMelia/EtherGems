@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -75,7 +75,7 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
                 if (listNBT != null) {
                     readItemStacksFromTag(items, listNBT);
                     for (int i = 0; i < 44; i++) {
-                        this.putStackInSlot(i, items[i]);
+                        this.setItem(i, items[i]);
                     }
                 }
             }
@@ -83,12 +83,12 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
         ArrayList<String> attributeList = new ArrayList<String>();
         for (int i = 0; i < 8; i++) {
             Slot currentSlot = this.getSlot(36 + i);
-            if (currentSlot.getHasStack() && (currentSlot.getStack().getItem() instanceof Crystal || currentSlot.getStack().getItem() instanceof Cylinder)) {
-                ItemStack stack = currentSlot.getStack();
+            if (currentSlot.hasItem() && (currentSlot.getItem().getItem() instanceof Crystal || currentSlot.getItem().getItem() instanceof Cylinder)) {
+                ItemStack stack = currentSlot.getItem();
                 LazyOptional<ICrystal> crystalCapability = stack.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
                 ICrystal crystal = crystalCapability.orElse(new CrystalInstance());
                 String attributeString = crystal.getAttributesCSV();
@@ -108,9 +108,9 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
                 }
             }
         }
-        ItemStack stack = super.slotClick(slotId, dragType, clickTypeIn, player);
+        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
         if (slotId < 44 && slotId >= 0) {
-            ItemStack placedStack = this.getSlot(slotId).getStack();
+            ItemStack placedStack = this.getSlot(slotId).getItem();
             if (placedStack.getItem() instanceof Crystal || placedStack.getItem() instanceof Cylinder) {
                 LazyOptional<ICrystal> crystalCapability = placedStack.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
                 ICrystal crystal = crystalCapability.orElse(new CrystalInstance());
@@ -120,12 +120,12 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
                     boolean hasPlaced = false;
                     for (int i = 0; i < 36; i++) {
                         Slot slot = this.getSlot(i);
-                        if (!slot.getHasStack() && !hasPlaced) {
-                            this.putStackInSlot(i, placedStack);
+                        if (!slot.hasItem() && !hasPlaced) {
+                            this.setItem(i, placedStack);
                             hasPlaced = true;
                         }
                     }
-                    this.putStackInSlot(slotId, ItemStack.EMPTY);
+                    this.setItem(slotId, ItemStack.EMPTY);
                 }
             }
         }
@@ -133,9 +133,9 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
         int count = 0;
         for (int i = 0; i < 8; i++) {
             Slot currentSlot = this.getSlot(36 + i);
-            if (currentSlot.getHasStack() && isCrystal(currentSlot.getStack())) {
+            if (currentSlot.hasItem() && isCrystal(currentSlot.getItem())) {
                 count++;
-                ItemStack currentSlotStack = currentSlot.getStack();
+                ItemStack currentSlotStack = currentSlot.getItem();
                 currentSlotStacks[i] = currentSlotStack;
             }
         }
@@ -153,7 +153,7 @@ public class EtherFurnaceInventoryContainer extends EtherFurnaceContainer {
     public void openGui() {
         ItemStack[] items = new ItemStack[44];
         for (int i = 0; i < items.length; i++) {
-            items[i] = this.getSlot(i).getStack();
+            items[i] = this.getSlot(i).getItem();
         }
         OpenOptionsContainerMessage openOptionsContainerMessage = new OpenOptionsContainerMessage(items);
         NetworkHandler.simpleChannel.sendToServer(openOptionsContainerMessage);

@@ -15,7 +15,6 @@ import machinamelia.ethergems.common.capabilities.crystals.CrystalInstance;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class FireCrystalInstance extends CrystalInstance {
 

@@ -36,9 +36,9 @@ public class SlottedArmorStorage implements Capability.IStorage<ISlottedArmor> {
                 compoundNBT.putString("Element", instance.getElement());
                 compoundNBT.putString("Tooltip", gem.getTooltipString());
             }
-            compoundNBT.putBoolean("HasInited", instance.getHasInited());
-            compoundNBT.putInt("Slots", instance.getSlots());
         }
+        compoundNBT.putBoolean("HasInited", instance.getHasInited());
+        compoundNBT.putInt("Slots", instance.getSlots());
         return compoundNBT;
     }
 
@@ -53,7 +53,6 @@ public class SlottedArmorStorage implements Capability.IStorage<ISlottedArmor> {
         String tooltipString = compoundNBT.getString("Tooltip");
         ItemStack gem = GemHandler.createGem(level, element, attribute, strength);
         instance.setGem(gem);
-        instance.setHasInited(compoundNBT.getBoolean("HasInited"));
         instance.setSlots(compoundNBT.getInt("Slots"));
         instance.setAttribute(attribute);
         instance.setElement(element);

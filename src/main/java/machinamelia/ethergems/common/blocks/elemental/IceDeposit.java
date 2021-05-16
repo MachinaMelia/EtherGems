@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.blocks.elemental;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -19,8 +19,8 @@ import machinamelia.ethergems.common.init.ItemInit;
 
 public class IceDeposit extends EtherDeposit {
     public IceDeposit() {
-        super(Block.Properties.create(Material.ROCK)
-                .hardnessAndResistance(4.0f, 0.3f)
+        super(Block.Properties.of(Material.STONE)
+                .strength(4.0f, 0.3f)
                 .sound(SoundType.STONE)
                 .harvestLevel(1)
                 .harvestTool(ToolType.PICKAXE));

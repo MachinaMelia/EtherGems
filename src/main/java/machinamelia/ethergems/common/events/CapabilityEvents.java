@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -32,7 +32,7 @@ import machinamelia.ethergems.common.items.crystals.*;
 import machinamelia.ethergems.common.items.cylinders.Cylinder;
 import machinamelia.ethergems.common.items.gems.Gem;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CapabilityEvents {
 
     public static final ResourceLocation CRYSTAL_CAPABILITY = new ResourceLocation(EtherGems.MOD_ID, "crystal");
@@ -73,7 +73,7 @@ public class CapabilityEvents {
 
         if (item instanceof ArmorItem) {
             ArmorItem armor = (ArmorItem) item;
-            IArmorMaterial material = armor.getArmorMaterial();
+            IArmorMaterial material = armor.getMaterial();
             if (material.equals(ArmorMaterial.LEATHER)) {
                 event.addCapability(ARMOR_CAPABILITY, new SlottedLeatherArmorProvider());
             } else if (material.equals(ArmorMaterial.IRON)) {

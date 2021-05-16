@@ -1,7 +1,7 @@
 package machinamelia.ethergems.client.screens;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -63,34 +63,34 @@ public class UpdatedInventoryScreen extends InventoryScreen {
     @Override
     protected void init() {
         super.init();
-        this.addButton(new ImageButton(this.guiLeft + 128, this.height / 2 - 22, 20, 18, 0, 0, 19, CRYSTAL_BUTTON_TEXTURE, (onPressed) -> {
-            ((ImageButton)onPressed).setPosition(this.guiLeft + 128, this.height / 2 - 22);
+        this.addButton(new ImageButton(this.leftPos + 128, this.height / 2 - 22, 20, 18, 0, 0, 19, CRYSTAL_BUTTON_TEXTURE, (onPressed) -> {
+            ((ImageButton)onPressed).setPosition(this.leftPos + 128, this.height / 2 - 22);
             OpenCrystalInventoryMessage openCrystalInventoryMessage = new OpenCrystalInventoryMessage();
             NetworkHandler.simpleChannel.sendToServer(openCrystalInventoryMessage);
         }));
     }
 
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type) {
         if (slotId > 0) {
-            if (slotIn != null && slotIn.getHasStack() && (slotIn.getStack().getItem() instanceof SlottedSword || slotIn.getStack().getItem() instanceof SlottedAxe)) {
-                ItemStack weapon = slotIn.getStack();
+            if (slotIn != null && slotIn.hasItem() && (slotIn.getItem().getItem() instanceof SlottedSword || slotIn.getItem().getItem() instanceof SlottedAxe)) {
+                ItemStack weapon = slotIn.getItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
                 gems = new ItemStack[weaponInstance.getSlots()];
                 for (int i = 0; i < gems.length; i++) {
                     gems[i] = weaponInstance.getGem(i);
                 }
-                slotIn.putStack(ItemStack.EMPTY);
+                slotIn.set(ItemStack.EMPTY);
             }
-            super.handleMouseClick(slotIn, slotId, mouseButton, type);
-            if (slotIn != null && slotIn.getHasStack() && slotIn.getStack() != null && slotIn.getStack().getItem() instanceof ArmorItem) {
-                ItemStack armor = slotIn.getStack();
+            super.slotClicked(slotIn, slotId, mouseButton, type);
+            if (slotIn != null && slotIn.hasItem() && slotIn.getItem() != null && slotIn.getItem().getItem() instanceof ArmorItem) {
+                ItemStack armor = slotIn.getItem();
                 LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
                 ISlottedArmor armorInstance = armorCapability.orElse(new SlottedArmorInstance());
             }
-            if (slotIn != null && slotIn.getHasStack() && slotIn.getStack() != null && slotIn.getStack().getItem() instanceof SwordItem) {
-                ItemStack weapon = slotIn.getStack();
+            if (slotIn != null && slotIn.hasItem() && slotIn.getItem() != null && slotIn.getItem().getItem() instanceof SwordItem) {
+                ItemStack weapon = slotIn.getItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
             }
@@ -103,8 +103,8 @@ public class UpdatedInventoryScreen extends InventoryScreen {
                 }
                 boolean isRemoving = this.player.getPersistentData().getBoolean("isRemoving");
                 boolean hasPlaced = false;
-                if (slotIn.getStack().getItem() instanceof SlottedArmor) {
-                    ItemStack armor = slotIn.getStack();
+                if (slotIn.getItem().getItem() instanceof SlottedArmor) {
+                    ItemStack armor = slotIn.getItem();
                     LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
                     ISlottedArmor armorInstance = armorCapability.orElse(new SlottedArmorInstance());
                     if (armorInstance.getGem() == null || armorInstance.getGem() != null && armorInstance.getGem().getItem().equals(Items.AIR)) {
@@ -130,9 +130,9 @@ public class UpdatedInventoryScreen extends InventoryScreen {
                     }
                 }
             }
-            if (slotIn != null && slotIn.getHasStack() && (slotIn.getStack().getItem() instanceof SlottedSword || slotIn.getStack().getItem() instanceof SlottedAxe)) {
+            if (slotIn != null && slotIn.hasItem() && (slotIn.getItem().getItem() instanceof SlottedSword || slotIn.getItem().getItem() instanceof SlottedAxe)) {
                 if (this.gems != null) {
-                    ItemStack weapon = slotIn.getStack();
+                    ItemStack weapon = slotIn.getItem();
                     LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                     ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
                     weaponInstance.setSlots(gems.length);
@@ -141,8 +141,8 @@ public class UpdatedInventoryScreen extends InventoryScreen {
                     }
                 }
             }
-            if (player.getHeldItemMainhand().getItem() instanceof SlottedSword || player.getHeldItemMainhand().getItem() instanceof SlottedAxe) {
-                ItemStack weapon = player.getHeldItemMainhand();
+            if (player.getMainHandItem().getItem() instanceof SlottedSword || player.getMainHandItem().getItem() instanceof SlottedAxe) {
+                ItemStack weapon = player.getMainHandItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
                 if (gems != null) {
@@ -164,7 +164,7 @@ public class UpdatedInventoryScreen extends InventoryScreen {
                 }
             }
         } else {
-            super.handleMouseClick(slotIn, slotId, mouseButton, type);
+            super.slotClicked(slotIn, slotId, mouseButton, type);
         }
     }
 
@@ -172,6 +172,6 @@ public class UpdatedInventoryScreen extends InventoryScreen {
     @Override
     public void tick() {
         ImageButton button = (ImageButton) this.buttons.get(1);
-        button.setPosition(this.guiLeft + 128, this.height / 2 - 22);
+        button.setPosition(this.leftPos + 128, this.height / 2 - 22);
     }
 }

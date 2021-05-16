@@ -1,7 +1,7 @@
 package machinamelia.ethergems.client.screens;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.client.screens;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.Widget;
@@ -53,34 +54,34 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
 
     public EtherFurnaceCraftingScreen(EtherFurnaceCraftingContainer screenContainer, PlayerInventory playerInventory, ITextComponent titleIn) {
         super(screenContainer, playerInventory, titleIn);
-        this.guiLeft = 0;
-        this.guiTop = 0;
-        this.xSize = 345;
-        this.ySize = 155;
-        this.container.setFlameIndex(4);
+        this.leftPos = 0;
+        this.topPos = 0;
+        this.imageWidth = 345;
+        this.imageHeight = 155;
+        this.getMenu().setFlameIndex(4);
     }
     @OnlyIn(Dist.CLIENT)
     @Override
     public void init() {
         super.init();
-        this.x = (this.width - this.xSize) / 2;
-        this.y = (this.height - this.ySize) / 2;
+        this.x = (this.width - this.imageWidth) / 2;
+        this.y = (this.height - this.imageHeight) / 2;
     }
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(final int mouseX, final int mouseY, final float partialTicks) {
-        this.renderBackground();
+    public void render(MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
+        this.renderBackground(matrixStack);
 
         if (!this.confirmButtonPressed) {
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
         } else {
-            int i = this.guiLeft;
-            int j = this.guiTop;
-            this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, mouseX, mouseY));
+            int i = this.leftPos;
+            int j = this.topPos;
+            this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, matrixStack, mouseX, mouseY));
             RenderSystem.disableRescaleNormal();
             RenderSystem.disableDepthTest();
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
             RenderSystem.pushMatrix();
             RenderSystem.translatef((float) i, (float) j, 0.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -90,17 +91,17 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
             int l = 240;
             RenderSystem.glMultiTexCoord2f(33986, 240.0F, 240.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.drawGuiContainerForegroundLayer(mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+            this.renderLabels(matrixStack, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, matrixStack, mouseX, mouseY));
             RenderSystem.popMatrix();
             RenderSystem.enableDepthTest();
         }
 
-        this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
     @Override
-    public void renderBackground() {
-        super.renderBackground();
+    public void renderBackground(MatrixStack matrixStack) {
+        super.renderBackground(matrixStack);
     }
     @Override
     public boolean isPauseScreen() {
@@ -108,61 +109,60 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
     }
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         // Attribute display
-        this.minecraft.getTextureManager().bindTexture(ATTRIBUTE_DISPLAY_TEXTURE);
-        this.blit(x + 184, y + 36, 0, 0, 148, 91);
-        this.minecraft.getTextureManager().bindTexture(CYLINDER_GAUGE_TEXTURE);
-        this.blit(x + 169, y + 36, 0, 0, 14, 91);
-        int flameIndex = this.container.getFlameIndex();
+        this.minecraft.getTextureManager().bind(ATTRIBUTE_DISPLAY_TEXTURE);
+        this.blit(matrixStack, x + 184, y + 36, 0, 0, 148, 91);
+        this.minecraft.getTextureManager().bind(CYLINDER_GAUGE_TEXTURE);
+        this.blit(matrixStack, x + 169, y + 36, 0, 0, 14, 91);
+        int flameIndex = this.getMenu().getFlameIndex();
         switch(flameIndex) {
             case 0:
-                this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_STRONG_TEXTURE);
-                this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                this.minecraft.getTextureManager().bind(ETHER_FURNACE_STRONG_TEXTURE);
+                this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 break;
             case 1:
-                this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_MEDIUM_TEXTURE);
-                this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                this.minecraft.getTextureManager().bind(ETHER_FURNACE_MEDIUM_TEXTURE);
+                this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 break;
             case 2:
-                this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_GENTLE_TEXTURE);
-                this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                this.minecraft.getTextureManager().bind(ETHER_FURNACE_GENTLE_TEXTURE);
+                this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 break;
             case 3:
                 if (previousFlameIndex == 0) {
-                    this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_STRONG_TEXTURE);
-                    this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                    this.minecraft.getTextureManager().bind(ETHER_FURNACE_STRONG_TEXTURE);
+                    this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 } else if (previousFlameIndex == 1) {
-                    this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_MEDIUM_TEXTURE);
-                    this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                    this.minecraft.getTextureManager().bind(ETHER_FURNACE_MEDIUM_TEXTURE);
+                    this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 } else if (previousFlameIndex == 2) {
-                    this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_GENTLE_TEXTURE);
-                    this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                    this.minecraft.getTextureManager().bind(ETHER_FURNACE_GENTLE_TEXTURE);
+                    this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 } else {
-                    this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_START_TEXTURE);
-                    this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                    this.minecraft.getTextureManager().bind(ETHER_FURNACE_START_TEXTURE);
+                    this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 }
             case 4:
-                this.minecraft.getTextureManager().bindTexture(ETHER_FURNACE_START_TEXTURE);
-                this.blit(x + 75, y + 18, 0, 0, 65, 125);
+                this.minecraft.getTextureManager().bind(ETHER_FURNACE_START_TEXTURE);
+                this.blit(matrixStack, x + 75, y + 18, 0, 0, 65, 125);
                 break;
         }
         previousFlameIndex = flameIndex;
     }
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
 
         final String strongFlameColorCode = "\u00A74";
         final String mediumFlameColorCode = "\u00A79";
         final String gentleFlameColorCode = "\u00A7a";
 
         String flameColorCode = "\u00A7f";
-        int flameIndex = this.container.getFlameIndex();
+        int flameIndex = this.getMenu().getFlameIndex();
         switch(flameIndex) {
             case 0:
                 flameColorCode = strongFlameColorCode;
@@ -174,18 +174,18 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
                 flameColorCode = gentleFlameColorCode;
         }
         if (flameIndex < 4) {
-            this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS_TEXTURE);
-            this.blit(75, 60, 0, 204, 66, 9);
-            this.font.drawString(flameColorCode + this.flames[flameIndex] + flameColorCode, 77.0f, 61.0f, 4210752);
+            this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS_TEXTURE);
+            this.blit(matrixStack, 75, 60, 0, 204, 66, 9);
+            this.font.draw(matrixStack, flameColorCode + this.flames[flameIndex] + flameColorCode, 77.0f, 61.0f, 4210752);
         }
-        ItemStack[] itemStacks = this.container.getCurrentSlotStacks();
+        ItemStack[] itemStacks = this.getMenu().getCurrentSlotStacks();
         ArrayList<Integer> startXList = new ArrayList<Integer>();
         ArrayList<Integer> startYList = new ArrayList<Integer>();
         ArrayList<String> colorCodes = new ArrayList<String>();
 
         boolean shouldDisableSlot = false;
-        if (this.container instanceof EtherFurnaceCraftingContainer) {
-            EtherFurnaceCraftingContainer container = (EtherFurnaceCraftingContainer) this.container;
+        if (this.getMenu() instanceof EtherFurnaceCraftingContainer) {
+            EtherFurnaceCraftingContainer container = (EtherFurnaceCraftingContainer) this.getMenu();
             ArrayList<String> attributeList = container.getAttributes();
             strengthList = container.getStrengths();
             ArrayList<Integer> amountList = container.getAmountList();
@@ -228,73 +228,73 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
                 numAttributes = 9;
                 shouldDisableSlot = true;
             }
-            this.container.disableSlots(shouldDisableSlot);
+            this.getMenu().disableSlots(shouldDisableSlot);
             final String whiteColorCode = "\u00A7f";
-            this.font.drawString(whiteColorCode + "Quality" + whiteColorCode, (float) 197, (float) 39, 4210752);
-            this.font.drawString(whiteColorCode + "Strength" + whiteColorCode, (float) 283, (float) 39, 4210752);
-            this.font.drawString(whiteColorCode + this.container.getCylinderCounter() + whiteColorCode, (float) 173, (float) 39, 4210752);
+            this.font.draw(matrixStack, whiteColorCode + "Quality" + whiteColorCode, (float) 197, (float) 39, 4210752);
+            this.font.draw(matrixStack,whiteColorCode + "Strength" + whiteColorCode, (float) 283, (float) 39, 4210752);
+            this.font.draw(matrixStack,whiteColorCode + this.getMenu().getCylinderCounter() + whiteColorCode, (float) 173, (float) 39, 4210752);
             boolean hasDrawHeat = false;
             for (int i = 0; i < numAttributes; i++) {
-                this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS_TEXTURE);
-                this.blit(187, 50 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
-                this.font.drawString(colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 197, (float) 50 + 8 * i, 4210752);
+                this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS_TEXTURE);
+                this.blit(matrixStack, 187, 50 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
+                this.font.draw(matrixStack,colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 197, (float) 50 + 8 * i, 4210752);
 
                 String heatColorCode = "\u00A7f";
                     if (strengthList.get(i) >= 300) {
                         heatColorCode = "\u00A74";
                         if (!hasDrawHeat) {
-                            this.font.drawString(heatColorCode + "MEGA HEAT" + heatColorCode, (float) 256, (float) 25, 4210752);
+                            this.font.draw(matrixStack,heatColorCode + "MEGA HEAT" + heatColorCode, (float) 256, (float) 25, 4210752);
                             hasDrawHeat = true;
                         }
                     } else if (strengthList.get(i) >= 200) {
                         heatColorCode = "\u00A76";
                         if (!hasDrawHeat) {
-                            this.font.drawString(heatColorCode + "  HEAT  " + heatColorCode, (float) 258, (float) 25, 4210752);
+                            this.font.draw(matrixStack,heatColorCode + "  HEAT  " + heatColorCode, (float) 258, (float) 25, 4210752);
                             hasDrawHeat = true;
                         }
                     } else if (strengthList.get(i) >= 100) {
                         heatColorCode = "\u00A73";
                     }
 
-                if (this.container.getIsFever()) {
+                if (this.getMenu().getIsFever()) {
                     String feverColorCode = "\u00A7e";
-                    this.font.drawString(feverColorCode + "  FEVER  " + feverColorCode, (float) 192, (float) 25, 4210752);
+                    this.font.draw(matrixStack,feverColorCode + "  FEVER  " + feverColorCode, (float) 192, (float) 25, 4210752);
                 }
 
-                this.font.drawString(heatColorCode + strengthList.get(i) + "%" + heatColorCode, (float) 284, (float) 50 + 8 * i, 4210752);
+                this.font.draw(matrixStack,heatColorCode + strengthList.get(i) + "%" + heatColorCode, (float) 284, (float) 50 + 8 * i, 4210752);
                 final String lightBlueColorCode = "\u00A7b";
                 if (amountList != null && amountList.size() > 0 && i < amountList.size() && amountList.get(i) != null && amountList.get(i) > 0) {
-                    this.font.drawString(lightBlueColorCode + amountList.get(i) + lightBlueColorCode, (float) 309, (float) 50 + 8 * i, 4210752);
-                    this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS_TEXTURE);
-                    this.blit(321, 50 + 8 * i,0, 139, 8, 7);
+                    this.font.draw(matrixStack,lightBlueColorCode + amountList.get(i) + lightBlueColorCode, (float) 309, (float) 50 + 8 * i, 4210752);
+                    this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS_TEXTURE);
+                    this.blit(matrixStack,321, 50 + 8 * i,0, 139, 8, 7);
                 }
-                int inversePercentage = 100 - this.container.getCylinderGauge();
+                int inversePercentage = 100 - this.getMenu().getCylinderGauge();
                 int cylinderGaugePixels = (int) (inversePercentage * 0.01 * 72);
-                this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS_TEXTURE);
-                this.blit(175, 53 + cylinderGaugePixels, 0, 66 + 66 - (72 - cylinderGaugePixels), 4, (72 - cylinderGaugePixels));
+                this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS_TEXTURE);
+                this.blit(matrixStack,175, 53 + cylinderGaugePixels, 0, 66 + 66 - (72 - cylinderGaugePixels), 4, (72 - cylinderGaugePixels));
                 int numGemAttributes = 0;
                 if (strengthList.get(i) >= 100) {
                     numGemAttributes++;
                 }
-                if (flameIndex == 3 && strengthList.get(i) < 100 && this.container.getButtonCounter() < numAttributes - numGemAttributes) {
+                if (flameIndex == 3 && strengthList.get(i) < 100 && this.getMenu().getButtonCounter() < numAttributes - numGemAttributes) {
                     final int index = i;
-                    this.container.addButtonCounter();
+                    this.getMenu().addButtonCounter();
                     if (i % 2 == 0) {
                         this.addButton(new ImageButton(x + 186, y + 50 + 8 * i, 148, 8, 0, 231, 8, CRAFTING_UI_ELEMENTS_TEXTURE, (onPressed) -> {
-                            this.container.createCylinder(index);
-                            if (this.container.getCylinderCounter() < 1 || this.container.getOriginalCylinderCounter() - this.container.getButtonCounter() == this.container.getCylinderCounter()) {
-                                this.container.resetButtonCounter();
+                            this.getMenu().createCylinder(index);
+                            if (this.getMenu().getCylinderCounter() < 1 || this.getMenu().getOriginalCylinderCounter() - this.getMenu().getButtonCounter() == this.getMenu().getCylinderCounter()) {
+                                this.getMenu().resetButtonCounter();
                                 this.buttons.remove(index);
-                                this.container.getTileEntity().setShouldOpen(true);
+                                this.getMenu().getTileEntity().setShouldOpen(true);
                             }
                         }));
                     } else {
                         this.addButton(new ImageButton(x + 186, y + 50 + 8 * i, 148, 8, 0, 214, 8, CRAFTING_UI_ELEMENTS_TEXTURE, (onPressed) -> {
-                            this.container.createCylinder(index);
-                            if (this.container.getCylinderCounter() < 1 || this.container.getOriginalCylinderCounter() - this.container.getButtonCounter() == this.container.getCylinderCounter()) {
-                               this.container.resetButtonCounter();
+                            this.getMenu().createCylinder(index);
+                            if (this.getMenu().getCylinderCounter() < 1 || this.getMenu().getOriginalCylinderCounter() - this.getMenu().getButtonCounter() == this.getMenu().getCylinderCounter()) {
+                               this.getMenu().resetButtonCounter();
                                this.buttons.remove(index);
-                               this.container.getTileEntity().setShouldOpen(true);
+                               this.getMenu().getTileEntity().setShouldOpen(true);
                             }
                         }));
                     }
@@ -305,8 +305,8 @@ public class EtherFurnaceCraftingScreen extends ContainerScreen<EtherFurnaceCraf
                     }
                 }
             }
-            if (flameIndex == 3 && this.container.getButtonCounter() == 0) {
-                this.container.getTileEntity().setShouldOpen(true);
+            if (flameIndex == 3 && this.getMenu().getButtonCounter() == 0) {
+                this.getMenu().getTileEntity().setShouldOpen(true);
             }
         }
     }

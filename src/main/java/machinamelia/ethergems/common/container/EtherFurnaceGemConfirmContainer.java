@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -42,7 +42,7 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
         this.tileEntity = tileEntity;
         this.items = new ItemStackHandler(28);
         this.size = 28;
-        this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
+        this.canInteractWithCallable = IWorldPosCallable.create(tileEntity.getLevel(), tileEntity.getBlockPos());
         this.initSlots();
         this.initInventory();
     }
@@ -52,7 +52,7 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
     private static EtherFurnaceTileEntity getTileEntity(final PlayerInventory playerInventory, final PacketBuffer data) {
         Objects.requireNonNull(playerInventory, "playerInventory cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
-        final TileEntity tileAtPos = playerInventory.player.world.getTileEntity(data.readBlockPos());
+        final TileEntity tileAtPos = playerInventory.player.level.getBlockEntity(data.readBlockPos());
         if (tileAtPos instanceof EtherFurnaceTileEntity) {
             return (EtherFurnaceTileEntity) tileAtPos;
         }
@@ -87,7 +87,7 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
                 if (listNBT != null) {
                     readItemStacksFromTag(items, listNBT);
                     for (int i = 0; i < 27; i++) {
-                        this.putStackInSlot(i, items[i]);
+                        this.setItem(i, items[i]);
                     }
                 }
             }
@@ -95,10 +95,10 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-        ItemStack stack = super.slotClick(slotId, dragType, clickTypeIn, player);
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
         if (slotId == 27) {
-            this.putStackInSlot(slotId, ItemStack.EMPTY);
+            this.setItem(slotId, ItemStack.EMPTY);
             ItemStack[] itemStacks = new ItemStack[27];
             for (int i = 0; i < 27; i++) {
                 itemStacks[i] = this.items.getStackInSlot(i);
@@ -120,7 +120,7 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
                 itemList.add(stack);
             }
         }
-        this.player.closeScreen();
+        this.player.closeContainer();
         ItemStack[] empty = new ItemStack[27];
         CompoundNBT compoundNBT = new CompoundNBT();
         compoundNBT.put("Items", writeItemStacksToTag(empty, 27));
@@ -133,7 +133,7 @@ public class EtherFurnaceGemConfirmContainer extends EtherFurnaceContainer {
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         return ItemStack.EMPTY;
     }
 

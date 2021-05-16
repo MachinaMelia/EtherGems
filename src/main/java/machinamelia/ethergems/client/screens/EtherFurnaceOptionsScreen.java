@@ -1,7 +1,7 @@
 package machinamelia.ethergems.client.screens;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.client.screens;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
@@ -18,6 +19,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiContainerEvent;
@@ -51,7 +53,7 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
     private int shooterIndex = 0;
     private int engineerIndex = 1;
     private int affinityIndex = 0;
-    private PlayerEntity player = playerInventory.player;
+    private PlayerEntity player = this.inventory.player;
 
     @Override
     protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton) {
@@ -60,10 +62,10 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
     }
     public EtherFurnaceOptionsScreen(EtherFurnaceOptionsContainer screenContainer, PlayerInventory playerInventory, ITextComponent titleIn) {
         super(screenContainer, playerInventory, titleIn);
-        this.guiLeft = 0;
-        this.guiTop = 0;
-        this.xSize = 345;
-        this.ySize = 155;
+        this.leftPos = 0;
+        this.topPos = 0;
+        this.imageWidth = 345;
+        this.imageHeight = 155;
         this.shooterIndex = 0;
         this.engineerIndex = 1;
     }
@@ -80,13 +82,13 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
     @Override
     public void init() {
         super.init();
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         this.addButton(new ImageButton(x + 58, y + 133, 72, 13, 0, 0, 14, CRAFTING_UI_ELEMENTS, (onPressed) -> {
             ((ImageButton)onPressed).setPosition(x + 58, y + 133);
             this.confirmButtonPressed = true;
-            this.container.saveInformation(shooterIndex, engineerIndex, affinityIndex);
-            this.container.openGui();
+            this.getMenu().saveInformation(shooterIndex, engineerIndex, affinityIndex);
+            this.getMenu().openGui();
         }));
         // Crafting Turn Left and Right Toggles
         this.addButton(new ImageButton(x + 49, y + 31, 6, 9, 0, 38, 0, CRAFTING_UI_ELEMENTS, (onPressed) -> {
@@ -186,19 +188,19 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(final int mouseX, final int mouseY, final float partialTicks) {
-        this.renderBackground();
+    public void render(MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
+        this.renderBackground(matrixStack);
 
         if (!this.confirmButtonPressed) {
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
         } else {
-            int i = this.guiLeft;
-            int j = this.guiTop;
-            this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, mouseX, mouseY));
+            int i = this.leftPos;
+            int j = this.topPos;
+            this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, matrixStack, mouseX, mouseY));
             RenderSystem.disableRescaleNormal();
             RenderSystem.disableDepthTest();
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
             RenderSystem.pushMatrix();
             RenderSystem.translatef((float) i, (float) j, 0.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -208,17 +210,17 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
             int l = 240;
             RenderSystem.glMultiTexCoord2f(33986, 240.0F, 240.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.drawGuiContainerForegroundLayer(mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+            this.renderLabels(matrixStack, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, matrixStack, mouseX, mouseY));
             RenderSystem.popMatrix();
             RenderSystem.enableDepthTest();
         }
 
-        this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
     @Override
-    public void renderBackground() {
-        super.renderBackground();
+    public void renderBackground(MatrixStack matrixStack) {
+        super.renderBackground(matrixStack);
     }
     @Override
     public boolean isPauseScreen() {
@@ -226,26 +228,25 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
     }
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         // Crystal inventory
-        this.minecraft.getTextureManager().bindTexture(CRAFTING_OPTIONS_TEXTURE);
-        this.blit(x, y + 13, 0, 0, 192, 140);
+        this.minecraft.getTextureManager().bind(CRAFTING_OPTIONS_TEXTURE);
+        this.blit(matrixStack, x, y + 13, 0, 0, 192, 140);
         // Attribute display
-        this.minecraft.getTextureManager().bindTexture(ATTRIBUTE_DISPLAY_TEXTURE);
-        this.blit(x + 204, y + 64, 0, 0, 148, 91);
+        this.minecraft.getTextureManager().bind(ATTRIBUTE_DISPLAY_TEXTURE);
+        this.blit(matrixStack, x + 204, y + 64, 0, 0, 148, 91);
         // Crystal selection
-        this.minecraft.getTextureManager().bindTexture(CRYSTAL_SELECTION_TEXTURE);
-        this.blit(x + 204, y, 0, 0, 86, 60);
+        this.minecraft.getTextureManager().bind(CRYSTAL_SELECTION_TEXTURE);
+        this.blit(matrixStack, x + 204, y, 0, 0, 86, 60);
     }
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        this.font.drawString("Confirm", 75.0f, 136.0f, 4210752);
-        ItemStack[] itemStacks = this.container.getCurrentSlotStacks();
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+        this.font.draw(matrixStack, "Confirm", 75.0f, 136.0f, 4210752);
+        ItemStack[] itemStacks = this.getMenu().getCurrentSlotStacks();
         ArrayList<Integer> startXList = new ArrayList<Integer>();
         ArrayList<Integer> startYList = new ArrayList<Integer>();
         ArrayList<String> colorCodes = new ArrayList<String>();
@@ -337,36 +338,36 @@ public class EtherFurnaceOptionsScreen extends ContainerScreen<EtherFurnaceOptio
             numAttributes = 9;
             shouldDisableSlot = true;
         }
-        this.container.disableSlots(shouldDisableSlot);
+        this.getMenu().disableSlots(shouldDisableSlot);
         final String whiteColorCode = "\u00A7f";
-        this.font.drawString(whiteColorCode + "Quality" + whiteColorCode, (float) 218, (float) 67, 4210752);
-        this.font.drawString(whiteColorCode + "Strength" + whiteColorCode, (float) 295, (float) 67, 4210752);
-        this.font.drawString("Craft Turns", (float) 66, (float) 27, 4210752);
-        this.font.drawString("Shooter", (float) 28, (float) 52, 4210752);
-        this.font.drawString("Engineer", (float) 125, (float) 52, 4210752);
-        this.font.drawString(turnString[affinityIndex], (float) 90, (float) 37, 4210752);
+        this.font.draw(matrixStack,whiteColorCode + "Quality" + whiteColorCode, (float) 218, (float) 67, 4210752);
+        this.font.draw(matrixStack,whiteColorCode + "Strength" + whiteColorCode, (float) 295, (float) 67, 4210752);
+        this.font.draw(matrixStack,"Craft Turns", (float) 66, (float) 27, 4210752);
+        this.font.draw(matrixStack, "Shooter", (float) 28, (float) 52, 4210752);
+        this.font.draw(matrixStack, "Engineer", (float) 125, (float) 52, 4210752);
+        this.font.draw(matrixStack, turnString[affinityIndex], (float) 90, (float) 37, 4210752);
         if (shooterIndex >= 0 && shooterIndex < 7) {
             final String shooterColorCode = "\u00A7e";
             final String boldCode = "\u00A7l";
-            this.font.drawString(shooterColorCode + shooterAbilities[shooterIndex] + shooterColorCode, (float) 11, (float) 81, 4210752);
-            this.font.drawSplitString(shooterDescriptions[shooterIndex], 11, 92, 80,4210752);
+            this.font.draw(matrixStack, shooterColorCode + shooterAbilities[shooterIndex] + shooterColorCode, (float) 11, (float) 81, 4210752);
+            this.font.drawWordWrap(new StringTextComponent(shooterDescriptions[shooterIndex]), 11, 92, 80, 4210752);
         }
         final String strongFlameColorCode = "\u00A74";
         final String mediumFlameColorCode = "\u00A79";
         final String gentleFlameColorCode = "\u00A7a";
         if (engineerIndex >= 0 && engineerIndex < 7) {
-            this.font.drawString(strongFlameColorCode + "Strong Flame" + strongFlameColorCode, (float) 114, (float) 71, 4210752);
-            this.font.drawString(strongFlameColorCode + engineerAbilities[engineerIndex][0] + "%" + strongFlameColorCode, (float) 140, (float) 81, 4210752);
-            this.font.drawString(mediumFlameColorCode + "Medium Flame" + mediumFlameColorCode, (float) 114, (float) 91, 4210752);
-            this.font.drawString(mediumFlameColorCode + engineerAbilities[engineerIndex][1] + "%" + mediumFlameColorCode, (float) 140, (float) 101, 4210752);
-            this.font.drawString(gentleFlameColorCode + "Gentle Flame" + gentleFlameColorCode, (float) 114, (float) 111, 4210752);
-            this.font.drawString(gentleFlameColorCode + engineerAbilities[engineerIndex][2] + "%" + gentleFlameColorCode, (float) 140, (float) 121, 4210752);
+            this.font.draw(matrixStack, strongFlameColorCode + "Strong Flame" + strongFlameColorCode, (float) 114, (float) 71, 4210752);
+            this.font.draw(matrixStack, strongFlameColorCode + engineerAbilities[engineerIndex][0] + "%" + strongFlameColorCode, (float) 140, (float) 81, 4210752);
+            this.font.draw(matrixStack, mediumFlameColorCode + "Medium Flame" + mediumFlameColorCode, (float) 114, (float) 91, 4210752);
+            this.font.draw(matrixStack, mediumFlameColorCode + engineerAbilities[engineerIndex][1] + "%" + mediumFlameColorCode, (float) 140, (float) 101, 4210752);
+            this.font.draw(matrixStack, gentleFlameColorCode + "Gentle Flame" + gentleFlameColorCode, (float) 114, (float) 111, 4210752);
+            this.font.draw(matrixStack, gentleFlameColorCode + engineerAbilities[engineerIndex][2] + "%" + gentleFlameColorCode, (float) 140, (float) 121, 4210752);
         }
         for (int i = 0; i < numAttributes; i++) {
-            this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS);
-            this.blit(207, 78 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
-            this.font.drawString(colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 218, (float) 78 + 8 * i, 4210752);
-            this.font.drawString(colorCodes.get(i) + strengthList.get(i) + "%" + colorCodes.get(i), (float) 315, (float) 78 + 8 * i, 4210752);
+            this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS);
+            this.blit(matrixStack, 207, 78 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
+            this.font.draw(matrixStack, colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 218, (float) 78 + 8 * i, 4210752);
+            this.font.draw(matrixStack, colorCodes.get(i) + strengthList.get(i) + "%" + colorCodes.get(i), (float) 315, (float) 78 + 8 * i, 4210752);
         }
     }
 }

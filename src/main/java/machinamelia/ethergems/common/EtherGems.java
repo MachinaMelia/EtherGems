@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,29 +10,15 @@ package machinamelia.ethergems.common;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.client.screens.UpdatedInventoryScreen;
 import machinamelia.ethergems.common.init.*;
 import machinamelia.ethergems.common.util.ConfigHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import machinamelia.ethergems.common.world.gen.EtherDepositGen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.potion.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.placement.IPlacementConfig;
-import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -42,7 +28,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import machinamelia.ethergems.common.capabilities.armor.ISlottedArmor;
@@ -59,12 +44,10 @@ import machinamelia.ethergems.common.capabilities.weapons.ISlottedWeapon;
 import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponInstance;
 import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponStorage;
 import machinamelia.ethergems.common.capabilities.world.CrystalLevelInstance;
-import machinamelia.ethergems.common.capabilities.world.CrystalLevelProvider;
 import machinamelia.ethergems.common.capabilities.world.CrystalLevelStorage;
 import machinamelia.ethergems.common.capabilities.world.ICrystalLevel;
 import machinamelia.ethergems.common.events.*;
 import machinamelia.ethergems.common.network.*;
-import machinamelia.ethergems.common.world.gen.EtherDepositGen;
 import java.util.*;
 
 @Mod("ethergems")
@@ -73,7 +56,6 @@ public class EtherGems {
 
     private static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "ethergems";
-    public static final ResourceLocation CRYSTAL_LEVEL_CAPABILITY = new ResourceLocation(EtherGems.MOD_ID, "crystal_level");
 
     private static IEventBus MOD_EVENT_BUS = null;
     private static Map<PlayerEntity, Effect> potionEffects = new HashMap<>();
@@ -100,7 +82,7 @@ public class EtherGems {
         ContainerInit.CONTAINER_TYPES.register(MOD_EVENT_BUS);
         ParticleInit.PARTICLES.register(MOD_EVENT_BUS);
         EffectInit.EFFECTS.register(MOD_EVENT_BUS);
-        FeatureInit.FEATURES.register(MOD_EVENT_BUS);
+        StructureInit.STRUCTURES.register(MOD_EVENT_BUS);
     }
 
     public static void registerCommonEvents() {
@@ -121,24 +103,10 @@ public class EtherGems {
         MinecraftForge.EVENT_BUS.register(PlayerUpdateEvents.class);
         MinecraftForge.EVENT_BUS.register(PlayerWorldEvents.class);
         MinecraftForge.EVENT_BUS.register(UpdateGemEvents.class);
+        MinecraftForge.EVENT_BUS.register(GuiEvents.class);
+        MinecraftForge.EVENT_BUS.register(EtherDepositGen.class);
     }
 
-    public static void registerClientOnlyEvents() {
-        MinecraftForge.EVENT_BUS.register(TooltipEvents.class);
-    }
-
-    private void setup(final FMLCommonSetupEvent event) {
-        EtherDepositGen.depositEther();
-        for (Biome biome : ForgeRegistries.BIOMES)
-        {
-            if (biome.equals(Biomes.SNOWY_MOUNTAINS) || biome.equals(Biomes.SNOWY_TUNDRA)) {
-                biome.addStructure(FeatureInit.OSE_TOWER.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG));
-                biome.addFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, FeatureInit.OSE_TOWER.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
-                        .withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
-            }
-        }
-        NetworkHandler.setupNetwork();
-    }
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         CapabilityManager.INSTANCE.register(ICrystal.class, new CrystalStorage(), CrystalInstance::new);
@@ -149,24 +117,22 @@ public class EtherGems {
         CapabilityManager.INSTANCE.register(ICrystalLevel.class, new CrystalLevelStorage(), CrystalLevelInstance::new);
     }
 
-    @SubscribeEvent
-    public void onAttachWorldCapabilities(final AttachCapabilitiesEvent<World> event) {
-        event.addCapability(CRYSTAL_LEVEL_CAPABILITY, new CrystalLevelProvider());
+    public static void registerClientOnlyEvents() {
+        MinecraftForge.EVENT_BUS.register(TooltipEvents.class);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public void replacePlayerInventoryEvent(GuiOpenEvent event) {
-        Screen screen = event.getGui();
-        if (screen instanceof InventoryScreen) {
-            PlayerEntity player = Minecraft.getInstance().player;
-            event.setGui(new UpdatedInventoryScreen(player));
-        }
+    private void setup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            StructureInit.registerStructurePieces();
+            StructureInit.setupStructures();
+            ConfiguredStructureInit.registerConfiguredStructures();
+        });
+        NetworkHandler.setupNetwork();
     }
 
     public static final ItemGroup TAB = new ItemGroup("ethergemsTab") {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(ItemInit.FIRE_GEM.get());
         }
     };

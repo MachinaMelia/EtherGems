@@ -24,8 +24,9 @@ public class RenderParticleOnClientMessage {
     public float ySpeed;
     public float zSpeed;
     public String uuid;
+    public int targetID;
 
-    public RenderParticleOnClientMessage(String uuid, int type, float x, float y, float z, float xSpeed, float ySpeed, float zSpeed)
+    public RenderParticleOnClientMessage(String uuid, int type, float x, float y, float z, float xSpeed, float ySpeed, float zSpeed, int targetID)
     {
         messageIsValid = true;
         this.uuid = uuid;
@@ -36,6 +37,7 @@ public class RenderParticleOnClientMessage {
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
         this.zSpeed = zSpeed;
+        this.targetID = targetID;
     }
 
     public boolean isMessageValid() {
@@ -57,7 +59,8 @@ public class RenderParticleOnClientMessage {
         float xSpeed = buf.readFloat();
         float ySpeed = buf.readFloat();
         float zSpeed = buf.readFloat();
-        RenderParticleOnClientMessage retval = new RenderParticleOnClientMessage(uuid, type, x, y, z, xSpeed, ySpeed, zSpeed);
+        int targetID = buf.readInt();
+        RenderParticleOnClientMessage retval = new RenderParticleOnClientMessage(uuid, type, x, y, z, xSpeed, ySpeed, zSpeed, targetID);
         retval.messageIsValid = true;
         return retval;
     }
@@ -72,6 +75,7 @@ public class RenderParticleOnClientMessage {
         buf.writeFloat(xSpeed);
         buf.writeFloat(ySpeed);
         buf.writeFloat(zSpeed);
+        buf.writeInt(targetID);
     }
 
     @Override

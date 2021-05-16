@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.particles;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -11,18 +11,18 @@ package machinamelia.ethergems.common.particles;
  */
 
 import net.minecraft.client.particle.*;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particles.BasicParticleType;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class FireEtherParticle extends EtherParticle  {
-    protected FireEtherParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
+    protected FireEtherParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-        this.particleRed = 0.65f;
-        this.particleGreen = 0.25f;
-        this.particleBlue = 0.25f;
+        this.rCol = 0.65f;
+        this.gCol = 0.25f;
+        this.bCol = 0.25f;
     }
     @OnlyIn(Dist.CLIENT)
     public static class Factory implements IParticleFactory<BasicParticleType> {
@@ -32,9 +32,12 @@ public class FireEtherParticle extends EtherParticle  {
         }
 
         @Override
-        public Particle makeParticle(BasicParticleType typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             FireEtherParticle fireEtherParticle = new FireEtherParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-            fireEtherParticle.selectSpriteRandomly(this.spriteSet);
+            if (fireEtherParticle.getLifetime() == 0) {
+                fireEtherParticle.setLifetime(1);
+            }
+            fireEtherParticle.setSpriteFromAge(this.spriteSet);
             return fireEtherParticle;
         }
     }

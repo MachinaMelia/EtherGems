@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.blocks.pure;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,15 +10,10 @@ package machinamelia.ethergems.common.blocks.pure;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.particles.IParticleData;
-import net.minecraft.world.storage.loot.LootContext;
 import machinamelia.ethergems.common.init.ItemInit;
 import machinamelia.ethergems.common.init.ParticleInit;
-
-import java.util.List;
 
 public class PureEarthDeposit extends PureEtherDeposit {
     public PureEarthDeposit() {

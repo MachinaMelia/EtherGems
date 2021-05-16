@@ -10,7 +10,6 @@ package machinamelia.ethergems.common.capabilities.crystals;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.common.events.PlayerWorldEvents;
 import net.minecraft.util.text.ITextComponent;
 
 import java.util.List;

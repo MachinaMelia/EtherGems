@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -25,16 +25,16 @@ import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.init.EffectInit;
 import machinamelia.ethergems.common.util.GemHandler;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FollowRangeEvents {
     @SubscribeEvent
     public static void followRangeEvent(LivingSetAttackTargetEvent event) {
-        if (event.getTarget() instanceof PlayerEntity && event.getEntityLiving().getActivePotionEffect(EffectInit.FOLLOW_RANGE_EFFECT.get()) == null) {
+        if (event.getTarget() instanceof PlayerEntity && event.getEntityLiving().getEffect(EffectInit.FOLLOW_RANGE_EFFECT.get()) == null) {
             PlayerEntity player = (PlayerEntity) event.getTarget();
             LivingEntity entity = event.getEntityLiving();
             int baseRange = 16;
             if (entity instanceof ZombieEntity) {
-                if (entity instanceof ZombiePigmanEntity) {
+                if (entity instanceof ZombifiedPiglinEntity) {
                     baseRange = 29;
                 } else {
                     baseRange = 33;
@@ -59,7 +59,7 @@ public class FollowRangeEvents {
                     fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
+                    entity.addEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange)));
                 }
             } else if (entity instanceof BeeEntity || entity instanceof GhastEntity || entity instanceof EnderDragonEntity || entity instanceof VexEntity || entity instanceof PhantomEntity || entity instanceof BlazeEntity) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Aerial Cloak");
@@ -67,7 +67,7 @@ public class FollowRangeEvents {
                     fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
+                    entity.addEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange)));
                 }
             } else {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Earth Cloak");
@@ -75,7 +75,7 @@ public class FollowRangeEvents {
                     fullStrength = 90.0;
                 }
                 if (fullStrength > 0) {
-                    entity.addPotionEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange * 2)));
+                    entity.addEffect(new EffectInstance(EffectInit.FOLLOW_RANGE_EFFECT.get(), 160, (int) (((fullStrength) / 100.0) * baseRange)));
                 }
             }
         }

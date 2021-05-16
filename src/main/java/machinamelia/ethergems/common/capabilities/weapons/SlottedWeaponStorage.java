@@ -58,7 +58,6 @@ public class SlottedWeaponStorage implements Capability.IStorage<ISlottedWeapon>
             String tooltipString = compoundNBT.getString("Tooltip");
             ItemStack gem = GemHandler.createGem(level, element, attribute, strength);
             instance.setGem(i, gem);
-
             instance.setAttribute(i, attribute);
             instance.setElement(i, element);
             instance.setLevel(i, level);

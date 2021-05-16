@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -43,7 +43,7 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
         this.tileEntity = tileEntity;
         this.items = new ItemStackHandler(10);
         this.size = 10;
-        this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
+        this.canInteractWithCallable = IWorldPosCallable.create(tileEntity.getLevel(), tileEntity.getBlockPos());
         this.initSlots();
         this.initInventory();
     }
@@ -53,7 +53,7 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
     private static EtherFurnaceTileEntity getTileEntity(final PlayerInventory playerInventory, final PacketBuffer data) {
         Objects.requireNonNull(playerInventory, "playerInventory cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
-        final TileEntity tileAtPos = playerInventory.player.world.getTileEntity(data.readBlockPos());
+        final TileEntity tileAtPos = playerInventory.player.level.getBlockEntity(data.readBlockPos());
         if (tileAtPos instanceof EtherFurnaceTileEntity) {
             return (EtherFurnaceTileEntity) tileAtPos;
         }
@@ -78,7 +78,7 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
     }
 
     protected void initInventory() {
-        if (!this.tileEntity.getIsLocked() && !player.world.isRemote) {
+        if (!this.tileEntity.getIsLocked() && !player.level.isClientSide) {
             CompoundNBT compoundNBT = (CompoundNBT) this.playerInventory.player.getPersistentData().get("cylinder_confirm_inventory");
             ItemStack[] items = new ItemStack[9];
             if (compoundNBT != null) {
@@ -90,7 +90,7 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
                         if (items[i] == null || items[i].getItem().equals(Items.AIR)) {
                             counter++;
                         }
-                        this.putStackInSlot(i, items[i]);
+                        this.setItem(i, items[i]);
                     }
                     if (counter == 9) {
                         this.openGui();
@@ -101,10 +101,10 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-        ItemStack stack = super.slotClick(slotId, dragType, clickTypeIn, player);
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
         if (slotId == 9) {
-            this.putStackInSlot(slotId, ItemStack.EMPTY);
+            this.setItem(slotId, ItemStack.EMPTY);
             ItemStack[] itemStacks = new ItemStack[9];
             for (int i = 0; i < 9; i++) {
                 itemStacks[i] = this.items.getStackInSlot(i);
@@ -120,7 +120,7 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
 
     @Override
     public void openGui() {
-        if (player.world.isRemote) {
+        if (player.level.isClientSide) {
             ArrayList<ItemStack> itemList = new ArrayList<ItemStack>();
             for (int i = 0; i < 9; i++) {
                 ItemStack stack = this.items.getStackInSlot(i);
@@ -144,11 +144,11 @@ public class EtherFurnaceCylinderConfirmContainer extends EtherFurnaceContainer 
     }
 
     public void closeGui() {
-        this.player.closeScreen();
+        this.player.closeContainer();
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         return ItemStack.EMPTY;
     }
 

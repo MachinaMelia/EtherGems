@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.items.gems;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -16,7 +16,6 @@ import machinamelia.ethergems.common.capabilities.gems.GemProvider;
 import machinamelia.ethergems.common.items.crystals.SingleItemBase;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class Gem extends SingleItemBase{
 
@@ -29,7 +28,7 @@ public class Gem extends SingleItemBase{
         CompoundNBT nbt = stack.getOrCreateTag();
         stack.getCapability(GemProvider.GEM_CAPABILITY).ifPresent(
                 handler -> {
-                    nbt.put("cap_sync", Objects.requireNonNull(GemProvider.GEM_CAPABILITY.writeNBT(handler, null)));
+                    nbt.put("cap_sync", GemProvider.GEM_CAPABILITY.writeNBT(handler, null));
                 }
         );
         return nbt;

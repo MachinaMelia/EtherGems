@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.effects.debuffs;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -31,7 +31,7 @@ public class ChillEffect extends Effect {
         super(EffectType.HARMFUL, 00000000);
     }
     @Override
-    public void performEffect(LivingEntity entity, int amplifier) {
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (!(entity instanceof DolphinEntity || entity instanceof PolarBearEntity || entity instanceof WolfEntity || entity instanceof StrayEntity || entity instanceof WitherSkeletonEntity)) {
             if (!entity.getPersistentData().contains("chill_counter")) {
                 entity.getPersistentData().putInt("chill_counter", 40);
@@ -43,22 +43,22 @@ public class ChillEffect extends Effect {
                 }
             }
             Random randy = new Random();
-            if (entity.world.isRemote && entity.getPersistentData().getInt("chill_counter") < 40) {
+            if (entity.level.isClientSide && entity.getPersistentData().getInt("chill_counter") < 40) {
                 if (entity.getPersistentData().getInt("chill_counter") % 3 == 2) {
-                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
+                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getX(), (float) (entity.getY() + 0.5 + randy.nextDouble()), (float) entity.getZ(), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
                 if (entity.getPersistentData().getInt("chill_counter") % 3 == 1) {
-                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
+                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getX(), (float) (entity.getY() + 0.5 + randy.nextDouble()), (float) entity.getZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
                 if (entity.getPersistentData().getInt("chill_counter") % 3 == 0) {
-                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getPosX(), (float) (entity.getPosY() + 0.5 + randy.nextDouble()), (float) entity.getPosZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
+                    SendParticleToServerWorldMessage sendParticleToServerWorldMessage = new SendParticleToServerWorldMessage(1, (float) entity.getX(), (float) (entity.getY() + 0.5 + randy.nextDouble()), (float) entity.getZ(), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (-0.33 * 0.04 * randy.nextDouble()), (float) (0.33 * 0.04 * randy.nextDouble()));
                     NetworkHandler.simpleChannel.sendToServer(sendParticleToServerWorldMessage);
                 }
             }
             if (entity.getPersistentData().getInt("chill_counter") < 0) {
-                entity.attackEntityFrom(DamageSource.MAGIC, 1.0F);
+                entity.hurt(DamageSource.MAGIC, 1.0F);
                 entity.getPersistentData().putInt("chill_counter", 40);
             } else {
                 int newCounter = entity.getPersistentData().getInt("chill_counter");
@@ -66,11 +66,11 @@ public class ChillEffect extends Effect {
                 entity.getPersistentData().putInt("chill_counter", newCounter);
             }
         } else {
-            entity.removePotionEffect(EffectInit.CHILL_EFFECT.get());
+            entity.removeEffect(EffectInit.CHILL_EFFECT.get());
         }
     }
     @Override
-    public boolean isReady(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
     }
 }

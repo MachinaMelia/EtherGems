@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -47,7 +47,7 @@ public class EtherFurnaceContainer extends Container {
         this.tileEntity = tileEntity;
         this.playerInventory = playerInventory;
         this.player = playerInventory.player;
-        this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
+        this.canInteractWithCallable = IWorldPosCallable.create(tileEntity.getLevel(), tileEntity.getBlockPos());
         this.size = 44;
     }
 
@@ -66,7 +66,7 @@ public class EtherFurnaceContainer extends Container {
     private static EtherFurnaceTileEntity getTileEntity(final PlayerEntity player, final PacketBuffer data) {
         Objects.requireNonNull(player, "player cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
-        final TileEntity tileAtPos = player.world.getTileEntity(data.readBlockPos());
+        final TileEntity tileAtPos = player.level.getBlockEntity(data.readBlockPos());
         if (tileAtPos instanceof EtherFurnaceTileEntity) {
             return (EtherFurnaceTileEntity) tileAtPos;
         }
@@ -87,31 +87,31 @@ public class EtherFurnaceContainer extends Container {
     }
 
     @Override
-    public void putStackInSlot(int slotID, ItemStack stack) {
+    public void setItem(int slotID, ItemStack stack) {
         if (this.isSlotsDisabled && slotID >= 36) {
             boolean isPutInSlot = false;
             for (int i = 0; i < 36; i++) {
                 Slot slot = this.getSlot(i);
-                if (!slot.getHasStack() && !isPutInSlot) {
-                    this.getSlot(i).putStack(stack);
+                if (!slot.hasItem() && !isPutInSlot) {
+                    this.getSlot(i).set(stack);
                     isPutInSlot = true;
                 }
             }
         } else if(this.getSlot(slotID) != null && stack != null) {
             if (slotID < 36) {
-                this.getSlot(slotID).putStack(stack);
+                this.getSlot(slotID).set(stack);
             }
         }
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         return itemstack;
     }
 
     @Override
-    protected boolean mergeItemStack(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
         return false;
     }
 
@@ -121,7 +121,7 @@ public class EtherFurnaceContainer extends Container {
             CompoundNBT tag = new CompoundNBT();
             tag.putShort("Slot", (short) i);
             if (items[i] != null) {
-                items[i].write(tag);
+                items[i].save(tag);
                 if (maxQuantity > Short.MAX_VALUE) {
                     tag.putInt("Quantity", items[i].getCount());
                 } else if (maxQuantity > Byte.MAX_VALUE) {
@@ -137,32 +137,32 @@ public class EtherFurnaceContainer extends Container {
             CompoundNBT tag = tagList.getCompound(i);
             int b = tag.getShort("Slot");
             if (b < items.length) {
-                items[b] = ItemStack.read(tag);
+                items[b] = ItemStack.of(tag);
                 INBT quant = tag.get("Quantity");
                 if (quant instanceof NumberNBT) {
-                    items[b].setCount(((NumberNBT) quant).getInt());
+                    items[b].setCount(((NumberNBT) quant).getAsInt());
                 }
             }
         }
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
             if (!this.tileEntity.getIsLocked()) {
-                this.tileEntity.setPlayerUsing(playerIn.getUniqueID());
+                this.tileEntity.setPlayerUsing(playerIn.getUUID());
                 this.tileEntity.setIsLocked(true);
-                return isWithinUsableDistance(canInteractWithCallable, playerIn, BlockInit.ETHER_FURNACE.get());
-            } else if (this.tileEntity.getPlayerUsing().equals(playerIn.getUniqueID())) {
-                return isWithinUsableDistance(canInteractWithCallable, playerIn, BlockInit.ETHER_FURNACE.get());
+                return stillValid(canInteractWithCallable, playerIn, BlockInit.ETHER_FURNACE.get());
+            } else if (this.tileEntity.getPlayerUsing().equals(playerIn.getUUID())) {
+                return stillValid(canInteractWithCallable, playerIn, BlockInit.ETHER_FURNACE.get());
             } else {
-                playerIn.sendMessage(new StringTextComponent("Ether Furnace in use!"));
+                playerIn.sendMessage(new StringTextComponent("Ether Furnace in use!"), playerIn.getUUID());
                 return false;
             }
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
-        if (this.tileEntity.getPlayerUsing() != null && this.tileEntity.getPlayerUsing().equals(playerIn.getUniqueID())) {
+    public void removed(PlayerEntity playerIn) {
+        if (this.tileEntity.getPlayerUsing() != null && this.tileEntity.getPlayerUsing().equals(playerIn.getUUID())) {
             this.tileEntity.setIsLocked(false);
             this.tileEntity.setPlayerUsing(null);
         }

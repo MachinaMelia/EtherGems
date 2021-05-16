@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,7 +10,6 @@ package machinamelia.ethergems.common.container;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import machinamelia.ethergems.common.network.server.PutGemsInInventoryMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -19,7 +18,6 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -43,11 +41,7 @@ import machinamelia.ethergems.common.network.server.OpenCrystalInventoryMessage;
 import machinamelia.ethergems.common.network.client.SendArmorGemToClientMessage;
 import machinamelia.ethergems.common.network.server.SendArmorGemToServerMessage;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-
-import static machinamelia.ethergems.common.container.EtherFurnaceContainer.writeItemStacksToTag;
 
 public class GemInventoryContainer extends Container {
 
@@ -90,7 +84,7 @@ public class GemInventoryContainer extends Container {
 
         slotSizePlus2 = 20;
         // Armor Slots
-        Iterator<ItemStack> armorList = this.playerInventory.player.getArmorInventoryList().iterator();
+        Iterator<ItemStack> armorList = this.playerInventory.player.getArmorSlots().iterator();
         for (int i = 0; i < 4; i++) {
             ItemStack armor = armorList.next();
             LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
@@ -105,7 +99,7 @@ public class GemInventoryContainer extends Container {
             this.addSlot(new SlotItemHandler(items, this.size + i, 38 + i * slotSizePlus2, 8));
             this.swordSlots++;
         }
-        ItemStack weapon = this.playerInventory.player.getHeldItemMainhand();
+        ItemStack weapon = this.playerInventory.player.getMainHandItem();
         if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
             LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
             ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
@@ -126,25 +120,25 @@ public class GemInventoryContainer extends Container {
             readItemStacksFromTag(items, listNBT, 44);
             int spaces = 0;
             for (int i = 0; i < 36; i++) {
-                this.putStackInSlot(i, items[i]);
+                this.setItem(i, items[i]);
             }
             for (int i = 0; i < 4; i++) {
                 if (this.hasArmor[i]) {
-                    this.putStackInSlot(i + 37 - spaces, items[i + 37]);
+                    this.setItem(i + 37 - spaces, items[i + 37]);
                 } else {
                     spaces++;
                 }
             }
             if (this.swordSlots > 0) {
                 for (int i = 0; i < swordSlots; i++) {
-                    this.putStackInSlot(i + 41 - spaces, items[i + 41]);
+                    this.setItem(i + 41 - spaces, items[i + 41]);
                 }
             }
         }
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         return ItemStack.EMPTY;
     }
 
@@ -154,7 +148,7 @@ public class GemInventoryContainer extends Container {
             CompoundNBT tag = new CompoundNBT();
             tag.putShort("Slot", (short) i);
             if (items[i] != null) {
-                items[i].write(tag);
+                items[i].save(tag);
                 if (maxQuantity > Short.MAX_VALUE) {
                     tag.putInt("Quantity", items[i].getCount());
                 } else if (maxQuantity > Byte.MAX_VALUE) {
@@ -170,20 +164,20 @@ public class GemInventoryContainer extends Container {
         for (int i = 0; i < size; i++) {
             CompoundNBT tag = tagList.getCompound(i);
             int b = tag.getShort("Slot");
-            items[b] = ItemStack.read(tag);
+            items[b] = ItemStack.of(tag);
             INBT quant = tag.get("Quantity");
             if (quant instanceof NumberNBT) {
-                items[b].setCount(((NumberNBT) quant).getInt());
+                items[b].setCount(((NumberNBT) quant).getAsInt());
             }
         }
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-        ItemStack stack = super.slotClick(slotId, dragType, clickTypeIn, player);
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+        ItemStack stack = super.clicked(slotId, dragType, clickTypeIn, player);
         if (slotId >= 36) {
             if (slotId == 36) {
-                this.putStackInSlot(slotId, ItemStack.EMPTY);
+                this.setItem(slotId, ItemStack.EMPTY);
             }
             ItemStack[] itemStacks = new ItemStack[44];
             for (int i = 0; i < 36; i++) {
@@ -204,25 +198,25 @@ public class GemInventoryContainer extends Container {
                 }
             }
             if (slotId >= this.size && clickTypeIn.equals(ClickType.PICKUP)) {
-                ItemStack weapon = player.getHeldItemMainhand();
+                ItemStack weapon = player.getMainHandItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
 
                 if (itemStacks[41 + (slotId - this.size)] != null) {
-                    if (player.world.isRemote) {
+                    if (player.level.isClientSide) {
                         SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(itemStacks[41 + (slotId - this.size)], 4 + slotId, true);
                         NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
                     } else {
-                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getUniqueID().toString(), itemStacks[41 + (slotId - this.size)], 4 + (slotId - this.size));
+                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), itemStacks[41 + (slotId - this.size)], 4 + (slotId - this.size));
                         NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                     }
                 }
                 else {
-                    if (player.world.isRemote) {
+                    if (player.level.isClientSide) {
                         SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(ItemStack.EMPTY, 4 + slotId, true);
                         NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
                     } else {
-                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getUniqueID().toString(), ItemStack.EMPTY, 4 + slotId);
+                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), ItemStack.EMPTY, 4 + slotId);
                         NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
                     }
                 }
@@ -241,7 +235,7 @@ public class GemInventoryContainer extends Container {
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
+    public void removed(PlayerEntity playerIn) {
         ItemStack[] itemStacks = new ItemStack[44];
         for (int i = 0; i < 36; i++) {
             itemStacks[i] = this.items.getStackInSlot(i);
@@ -267,7 +261,7 @@ public class GemInventoryContainer extends Container {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 }

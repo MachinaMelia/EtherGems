@@ -7,9 +7,11 @@
     
     showAsResourcePack=false
 
+    license="LGPL-2.1-or-later"
+
     [[mods]]
       modId="ethergems"
-      version="1.15.2-1.0.0.0"
+      version="1.16.5-2.0.0.0-beta1"
       displayName="Ether Gems Mod"
       displayURL="https://github.com/MachinaMelia/EtherGems"
       authors="MachinaMelia"
@@ -19,23 +21,23 @@
       Adds Gems, Gem Slots on Weapons and Armor, and a Ether Furnace for crafting Gems.
       '''
 
-      [[dependencies.ethergems]]
-        modId="polymorph"
-        mandatory=true
-        versionRange="[FORGE-1.15.2-0.10,)"
-        ordering="NONE"
-        side="BOTH"
+     [[dependencies.ethergems]]
+      modId="polymorph"
+      mandatory=true
+      versionRange="[1.16.5-0.24,)"
+      ordering="NONE"
+      side="BOTH"
 
       [[dependencies.ethergems]]
         modId="forge"
         mandatory=true
-        versionRange="[31.2.5,)"
+        versionRange="[36.1.0,)"
         ordering="NONE"
         side="BOTH"
 
       [[dependencies.ethergems]]
         modId="minecraft"
         mandatory=true
-        versionRange="[1.15.2]"
+        versionRange="[1.16.5]"
         ordering="NONE"
         side="BOTH"

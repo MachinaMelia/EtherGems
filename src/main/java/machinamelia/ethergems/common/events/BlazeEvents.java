@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -23,13 +23,13 @@ import machinamelia.ethergems.common.util.GemHandler;
 
 import java.util.Random;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BlazeEvents {
     @SubscribeEvent
     public static void blazeEvent(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            if (player.isBurning() && !player.getPersistentData().getBoolean("is_burning")) {
+            if (player.isOnFire() && !player.getPersistentData().getBoolean("is_burning")) {
                 double fullStrength = GemHandler.getPlayerGemStrength(player, "Debuff Resist");
                 if (fullStrength > 100.0) {
                     fullStrength = 100.0;
@@ -39,8 +39,8 @@ public class BlazeEvents {
                     int roll = randy.nextInt(100);
                     if (roll < fullStrength) {
                         player.getPersistentData().putBoolean("is_burning", false);
-                        player.extinguish();
-                        player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
+                        player.clearFire();
+                        player.removeEffect(EffectInit.BLAZE_EFFECT.get());
                     }
                 }
                 fullStrength = GemHandler.getPlayerGemStrength(player, "Blaze Defence");
@@ -49,32 +49,32 @@ public class BlazeEvents {
                 }
                 if (fullStrength == -100.0) {
                     player.getPersistentData().putBoolean("is_burning", false);
-                    player.extinguish();
-                    player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
+                    player.clearFire();
+                    player.removeEffect(EffectInit.BLAZE_EFFECT.get());
                 } else {
                     if (fullStrength < 0) {
-                        int oldTimer = player.getFireTimer();
+                        int oldTimer = player.getRemainingFireTicks();
                         int newTimer = (int) (oldTimer + ((fullStrength / 100.0) * oldTimer));
-                        player.setFireTimer(newTimer);
+                        player.setRemainingFireTicks(newTimer);
                     }
-                    int timer = player.getFireTimer();
+                    int timer = player.getRemainingFireTicks();
                     if (timer < 0) {
                         timer = 0;
                     }
                     player.getPersistentData().putBoolean("is_burning", true);
-                    player.addPotionEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), timer));
+                    player.addEffect(new EffectInstance(EffectInit.BLAZE_EFFECT.get(), timer));
                 }
             }
-            if (!player.isBurning()) {
+            if (!player.isOnFire()) {
                 player.getPersistentData().putBoolean("is_burning", false);
-                player.removePotionEffect(EffectInit.BLAZE_EFFECT.get());
+                player.removeEffect(EffectInit.BLAZE_EFFECT.get());
             }
         }
         LivingEntity entity = event.getEntityLiving();
-        if (entity.getActivePotionEffect(EffectInit.BIND_EFFECT.get()) == null) {
+        if (entity.getEffect(EffectInit.BIND_EFFECT.get()) == null) {
             if (entity instanceof MobEntity) {
                 MobEntity mob = (MobEntity) entity;
-                mob.setNoAI(false);
+                mob.setNoAi(false);
             }
         }
     }

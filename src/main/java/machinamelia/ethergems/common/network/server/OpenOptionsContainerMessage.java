@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.network.server;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -47,7 +47,7 @@ public class OpenOptionsContainerMessage {
         OpenOptionsContainerMessage retval = new OpenOptionsContainerMessage();
         retval.messageIsValid = true;
         for (int i = 0; i < 44; i++) {
-            ItemStack itemStackIn = buf.readItemStack();
+            ItemStack itemStackIn = buf.readItem();
             LazyOptional<ICrystal> crystalCapabilityOut = itemStackIn.getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
             ICrystal crystalIn = crystalCapabilityOut.orElse(new CrystalInstance());
             String attributesIn = new String(buf.readByteArray());
@@ -67,7 +67,7 @@ public class OpenOptionsContainerMessage {
         for (int i = 0; i < 44; i++) {
             LazyOptional<ICrystal> crystalCapabilityOut = items[i].getCapability(CrystalProvider.CRYSTAL_CAPABILITY);
             ICrystal crystalOut = crystalCapabilityOut.orElse(new CrystalInstance());
-            buf.writeItemStack(items[i]);
+            buf.writeItemStack(items[i], true);
             buf.writeByteArray(crystalOut.getAttributesCSV().getBytes());
             buf.writeInt(crystalOut.getLevel());
             buf.writeVarIntArray(crystalOut.getStrengthArray());

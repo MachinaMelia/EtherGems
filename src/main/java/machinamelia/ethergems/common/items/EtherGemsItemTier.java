@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.items;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -20,52 +20,52 @@ import java.util.function.Supplier;
 public enum EtherGemsItemTier implements IItemTier {
 
     MONADO(3, Integer.MAX_VALUE, 12.0F, 4.0F, 22, () -> {
-        return Ingredient.fromItems(ItemInit.FIRE_GEM.get());
+        return Ingredient.of(ItemInit.FIRE_GEM.get());
     });
 
-    private final int harvestLevel;
-    private final int maxUses;
-    private final int enchanablility;
-    private final float efficiency;
-    private final float attackDamage;
+    private final int level;
+    private final int uses;
+    private final int enchantmentValue;
+    private final float speed;
+    private final float attackDamageBonus;
     private final LazyValue<Ingredient> repairMaterial;
 
-    private EtherGemsItemTier(int harvestLevel, int maxUses, float efficiency, float attackDamage, int enchantibility, Supplier<Ingredient> repairMaterial) {
-        this.harvestLevel = harvestLevel;
-        this.maxUses = maxUses;
-        this.efficiency = efficiency;
-        this.attackDamage = attackDamage;
-        this.enchanablility = enchantibility;
+    private EtherGemsItemTier(int level, int uses, float speed, float attackDamageBonus, int enchantmentValue, Supplier<Ingredient> repairMaterial) {
+        this.level = level;
+        this.uses = uses;
+        this.speed = speed;
+        this.attackDamageBonus = attackDamageBonus;
+        this.enchantmentValue = enchantmentValue;
         this.repairMaterial = new LazyValue<>(repairMaterial);
     }
 
     @Override
-    public int getMaxUses() {
-        return this.maxUses;
+    public int getUses() {
+        return this.uses;
     }
 
     @Override
-    public float getEfficiency() {
-        return this.efficiency;
+    public float getSpeed() {
+        return this.speed;
     }
 
     @Override
-    public float getAttackDamage() {
-        return this.attackDamage;
+    public float getAttackDamageBonus() {
+        return this.attackDamageBonus;
     }
 
     @Override
-    public int getHarvestLevel() {
-        return this.harvestLevel;
+    public int getLevel() {
+        return this.level;
     }
 
     @Override
-    public int getEnchantability() {
-        return this.enchanablility;
+    public int getEnchantmentValue() {
+        return this.enchantmentValue;
     }
 
     @Override
-    public Ingredient getRepairMaterial() {
-        return this.repairMaterial.getValue();
+    public Ingredient getRepairIngredient() {
+        return this.repairMaterial.get();
     }
 }

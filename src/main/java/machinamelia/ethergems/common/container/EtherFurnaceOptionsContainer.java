@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.container;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -40,7 +40,7 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
         this.tileEntity = tileEntity;
         this.items = new ItemStackHandler(8);
         this.size = 8;
-        this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
+        this.canInteractWithCallable = IWorldPosCallable.create(tileEntity.getLevel(), tileEntity.getBlockPos());
         this.initSlots();
         this.initInventory();
     }
@@ -50,7 +50,7 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
     private static EtherFurnaceTileEntity getTileEntity(final PlayerInventory playerInventory, final PacketBuffer data) {
         Objects.requireNonNull(playerInventory, "playerInventory cannot be null");
         Objects.requireNonNull(data, "data cannot be null");
-        final TileEntity tileAtPos = playerInventory.player.world.getTileEntity(data.readBlockPos());
+        final TileEntity tileAtPos = playerInventory.player.level.getBlockEntity(data.readBlockPos());
         if (tileAtPos instanceof EtherFurnaceTileEntity) {
             return (EtherFurnaceTileEntity) tileAtPos;
         }
@@ -60,7 +60,7 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
     @Override
     public ItemStack[] getCurrentSlotStacks() {
         for (int i = 0; i < 8; i++) {
-            currentSlotStacks[i] = this.getSlot(i).getStack();
+            currentSlotStacks[i] = this.getSlot(i).getItem();
         }
         return currentSlotStacks;
     }
@@ -81,7 +81,7 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
 
                     for (int i = 36; i < 44; i++) {
                         if (items[i] != null) {
-                            this.putStackInSlot(i - 36, items[i]);
+                            this.setItem(i - 36, items[i]);
                         }
                     }
                 }
@@ -103,7 +103,7 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
     public void saveInformation(int shooterIndex, int engineerIndex, int affinityIndex) {
         ItemStack[] items = new ItemStack[8];
         for (int i = 0; i < items.length; i++) {
-            items[i] = this.getSlot(i).getStack();
+            items[i] = this.getSlot(i).getItem();
         }
         CompoundNBT compoundNBT = new CompoundNBT();
         compoundNBT.putInt("Shooter", shooterIndex);
@@ -121,18 +121,18 @@ public class EtherFurnaceOptionsContainer extends EtherFurnaceContainer {
     }
 
     @Override
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
         return ItemStack.EMPTY;
     }
     @Override
-    public void putStackInSlot(int slotID, ItemStack stack) {
-        this.getSlot(slotID).putStack(stack);
+    public void setItem(int slotID, ItemStack stack) {
+        this.getSlot(slotID).set(stack);
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
-        if (playerIn.world.isRemote) {
-            if (!(playerIn.openContainer instanceof EtherFurnaceContainer)) {
+    public void removed(PlayerEntity playerIn) {
+        if (playerIn.level.isClientSide) {
+            if (!(playerIn.containerMenu instanceof EtherFurnaceContainer)) {
                 ItemStack[] currentSlotStacks = this.getCurrentSlotStacks();
                 PutCrystalsInInventoryMessage putCrystalsInInventoryMessage = new PutCrystalsInInventoryMessage(currentSlotStacks);
                 NetworkHandler.simpleChannel.sendToServer(putCrystalsInInventoryMessage);

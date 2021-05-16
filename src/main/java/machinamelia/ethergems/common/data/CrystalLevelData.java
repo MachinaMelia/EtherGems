@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.data;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -26,12 +26,12 @@ public class CrystalLevelData extends WorldSavedData {
     }
 
     @Override
-    public void read(CompoundNBT nbt) {
+    public void load(CompoundNBT nbt) {
         this.crystalLevel = nbt.getInt("crystal_level");
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT nbt) {
+    public CompoundNBT save(CompoundNBT nbt) {
         nbt.putInt("crystal_level", this.crystalLevel);
         return nbt;
     }

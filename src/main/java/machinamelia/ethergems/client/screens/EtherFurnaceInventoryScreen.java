@@ -1,7 +1,7 @@
 package machinamelia.ethergems.client.screens;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.client.screens;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,10 +61,10 @@ public class EtherFurnaceInventoryScreen extends ContainerScreen<EtherFurnaceInv
     @OnlyIn(Dist.CLIENT)
     public EtherFurnaceInventoryScreen(EtherFurnaceInventoryContainer screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
-        this.guiLeft = 0;
-        this.guiTop = 0;
-        this.xSize = 345;
-        this.ySize = 155;
+        this.leftPos = 0;
+        this.topPos = 0;
+        this.imageWidth = 345;
+        this.imageHeight = 155;
         this.player = inv.player;
     }
 
@@ -71,13 +72,13 @@ public class EtherFurnaceInventoryScreen extends ContainerScreen<EtherFurnaceInv
     @Override
     public void init() {
         super.init();
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         this.addButton(new HoverlessImageButton(x + 58, y + 133, 72, 13, 0, 0, 14, CRAFTING_UI_ELEMENTS, (onPressed) -> {
             ((HoverlessImageButton)onPressed).setPosition(x + 58, y + 133);
             this.confirmButtonPressed = true;
             if (((HoverlessImageButton) onPressed).getHovered()) {
-                this.container.openGui();
+                this.getMenu().openGui();
                 this.confirmButtonPressed = false;
             }
         }));
@@ -86,26 +87,26 @@ public class EtherFurnaceInventoryScreen extends ContainerScreen<EtherFurnaceInv
 
     @Override
     public void tick() {
-        if (Minecraft.getInstance().world.isRemote) {
+        if (Minecraft.getInstance().level.isClientSide) {
             HoverlessImageButton button = (HoverlessImageButton) buttons.get(0);
-            button.setHovered(this.container.ableToConfirm);
+            button.setHovered(this.getMenu().ableToConfirm);
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void render(final int mouseX, final int mouseY, final float partialTicks) {
-        this.renderBackground();
+    public void render(MatrixStack matrixStack, final int mouseX, final int mouseY, final float partialTicks) {
+        this.renderBackground(matrixStack);
         if (!this.confirmButtonPressed) {
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
         } else {
-            int i = this.guiLeft;
-            int j = this.guiTop;
-            this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, mouseX, mouseY));
+            int i = this.leftPos;
+            int j = this.topPos;
+            this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawBackground(this, matrixStack, mouseX, mouseY));
             RenderSystem.disableRescaleNormal();
             RenderSystem.disableDepthTest();
-            super.render(mouseX, mouseY, partialTicks);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
             RenderSystem.pushMatrix();
             RenderSystem.translatef((float) i, (float) j, 0.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -115,30 +116,29 @@ public class EtherFurnaceInventoryScreen extends ContainerScreen<EtherFurnaceInv
             int l = 240;
             RenderSystem.glMultiTexCoord2f(33986, 240.0F, 240.0F);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.drawGuiContainerForegroundLayer(mouseX, mouseY);
-            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+            this.renderLabels(matrixStack, mouseX, mouseY);
+            MinecraftForge.EVENT_BUS.post(new GuiContainerEvent.DrawForeground(this, matrixStack, mouseX, mouseY));
             RenderSystem.popMatrix();
             RenderSystem.enableDepthTest();
         }
 
-        this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
-        if (this.container.getIsSlotsDisabled() && slotId >= 36 && (!type.equals(ClickType.PICKUP) || (type.equals(ClickType.PICKUP) && this.container.getSlot(slotId) != null && !this.container.getSlot(slotId).getHasStack()))) {
-        }  else if (this.container.getIsSlotsDisabled() && slotId < 36 && type.equals(ClickType.PICKUP) && this.container.getSlot(slotId).getHasStack()) {
+    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+        if (this.getMenu().getIsSlotsDisabled() && slotId >= 36 && (!type.equals(ClickType.PICKUP) || (type.equals(ClickType.PICKUP) && this.getMenu().getSlot(slotId) != null && !this.getMenu().getSlot(slotId).hasItem()))) {
+        }  else if (this.getMenu().getIsSlotsDisabled() && slotId < 36 && type.equals(ClickType.PICKUP) && this.getMenu().getSlot(slotId).hasItem()) {
         } else {
-            super.handleMouseClick(slotIn, slotId, mouseButton, type);
+            super.slotClicked(slotIn, slotId, mouseButton, type);
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        this.font.drawString("Confirm", 75.0f, 136.0f, 4210752);
-        ItemStack[] itemStacks = this.container.getCurrentSlotStacks();
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+        this.font.draw(matrixStack, "Confirm", 75.0f, 136.0f, 4210752);
+        ItemStack[] itemStacks = this.getMenu().getCurrentSlotStacks();
         ArrayList<Integer> startXList = new ArrayList<Integer>();
         ArrayList<Integer> startYList = new ArrayList<Integer>();
         ArrayList<String> colorCodes = new ArrayList<String>();
@@ -230,34 +230,34 @@ public class EtherFurnaceInventoryScreen extends ContainerScreen<EtherFurnaceInv
             numAttributes = 9;
             shouldDisableSlot = true;
         }
-        this.container.disableSlots(shouldDisableSlot);
+        this.getMenu().disableSlots(shouldDisableSlot);
         final String whiteColorCode = "\u00A7f";
-        this.font.drawString(whiteColorCode + "Quality" + whiteColorCode, (float) 218, (float) 67, 4210752);
-        this.font.drawString(whiteColorCode + "Strength" + whiteColorCode, (float) 295, (float) 67, 4210752);
+        this.font.draw(matrixStack, whiteColorCode + "Quality" + whiteColorCode, (float) 218, (float) 67, 4210752);
+        this.font.draw(matrixStack, whiteColorCode + "Strength" + whiteColorCode, (float) 295, (float) 67, 4210752);
         if (startXList.size() == numAttributes && startYList.size() == numAttributes) {
             for (int i = 0; i < numAttributes; i++) {
-                this.minecraft.getTextureManager().bindTexture(CRAFTING_UI_ELEMENTS);
-                this.blit(207, 78 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
-                this.font.drawString(colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 218, (float) 78 + 8 * i, 4210752);
-                this.font.drawString(colorCodes.get(i) + strengthList.get(i) + "%" + colorCodes.get(i), (float) 315, (float) 78 + 8 * i, 4210752);
+                this.minecraft.getTextureManager().bind(CRAFTING_UI_ELEMENTS);
+                this.blit(matrixStack, 207, 78 + 8 * i, startXList.get(i), startYList.get(i), 9, 8);
+                this.font.draw(matrixStack, colorCodes.get(i) + attributeList.get(i) + colorCodes.get(i), (float) 218, (float) 78 + 8 * i, 4210752);
+                this.font.draw(matrixStack, colorCodes.get(i) + strengthList.get(i) + "%" + colorCodes.get(i), (float) 315, (float) 78 + 8 * i, 4210752);
             }
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
         // Crystal inventory
-        this.minecraft.getTextureManager().bindTexture(CRYSTAL_INVENTORY_TEXTURE);
-        this.blit(x, y + 26, 0, 0, 192, 127);
+        this.minecraft.getTextureManager().bind(CRYSTAL_INVENTORY_TEXTURE);
+        this.blit(matrixStack, x, y + 26, 0, 0, 192, 127);
         // Attribute display
-        this.minecraft.getTextureManager().bindTexture(ATTRIBUTE_DISPLAY_TEXTURE);
-        this.blit(x + 204, y + 64, 0, 0, 148, 91);
+        this.minecraft.getTextureManager().bind(ATTRIBUTE_DISPLAY_TEXTURE);
+        this.blit(matrixStack, x + 204, y + 64, 0, 0, 148, 91);
         // Crystal selection
-        this.minecraft.getTextureManager().bindTexture(CRYSTAL_SELECTION_TEXTURE);
-        this.blit(x + 204, y, 0, 0, 86, 60);
+        this.minecraft.getTextureManager().bind(CRYSTAL_SELECTION_TEXTURE);
+        this.blit(matrixStack, x + 204, y, 0, 0, 86, 60);
     }
 }

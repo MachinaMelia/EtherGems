@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.network.client;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -37,7 +37,7 @@ public class SendArmorGemToClientMessage {
     public static SendArmorGemToClientMessage decode(PacketBuffer buf)
     {
         String uuid = new String(buf.readByteArray());
-        ItemStack armorGem = buf.readItemStack();
+        ItemStack armorGem = buf.readItem();
         int index = buf.readInt();
         SendArmorGemToClientMessage retval = new SendArmorGemToClientMessage(uuid, armorGem, index);
         retval.messageIsValid = true;
@@ -47,13 +47,13 @@ public class SendArmorGemToClientMessage {
     public void encode(PacketBuffer buf)
     {
         buf.writeByteArray(uuid.getBytes());
-        buf.writeItemStack(armorGem);
+        buf.writeItemStack(armorGem, true);
         buf.writeInt(index);
     }
 
     @Override
     public String toString()  {
-        return "SenArmorGemToClientMessage";
+        return "SendArmorGemToClientMessage";
     }
 
     private boolean messageIsValid;

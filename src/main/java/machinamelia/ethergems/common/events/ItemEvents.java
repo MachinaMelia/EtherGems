@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -27,17 +27,17 @@ import machinamelia.ethergems.common.capabilities.weapons.SlottedWeaponProvider;
 import machinamelia.ethergems.common.container.CrystalInventoryContainer;
 import machinamelia.ethergems.common.container.EtherFurnaceContainer;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ItemEvents {
     @SubscribeEvent
     public static void playerDropEvent(ItemTossEvent event) {
         PlayerEntity player = event.getPlayer();
-        if (player.openContainer instanceof EtherFurnaceContainer || player.openContainer instanceof CrystalInventoryContainer) {
+        if (player.containerMenu instanceof EtherFurnaceContainer || player.containerMenu instanceof CrystalInventoryContainer) {
             event.setCanceled(true);
             boolean hasPlaced = false;
             for (int i = 0; i < 36; i++) {
-                if (player.openContainer.getInventory().get(i).isEmpty() && !hasPlaced) {
-                    player.openContainer.putStackInSlot(i, event.getEntityItem().getItem());
+                if (player.containerMenu.getItems().get(i).isEmpty() && !hasPlaced) {
+                    player.containerMenu.setItem(i, event.getEntityItem().getItem());
                     hasPlaced = true;
                 }
             }

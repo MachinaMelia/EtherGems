@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.particles;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -12,7 +12,7 @@ package machinamelia.ethergems.common.particles;
 
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.world.World;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,22 +20,22 @@ import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public class EtherParticle extends SpriteTexturedParticle {
-    protected EtherParticle(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
+    protected EtherParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-        float f = this.rand.nextFloat() * 1.0f;
+        float f = this.random.nextFloat() * 1.0f;
         this.setSize(0.02f, 0.02f);
-        this.particleScale *= this.rand.nextFloat() * 1.1f;
-        this.motionX *= (double) 0.02f;
-        this.motionY *= (double) 0.02f;
-        this.motionZ *= (double) 0.02f;
+        this.quadSize *= this.random.nextFloat() * 1.1f;
+        this.xd *= (double) 0.02f;
+        this.yd *= (double) 0.02f;
+        this.zd *= (double) 0.02f;
         Random randy = new Random();
-        this.setMaxAge((int) (8.0d * randy.nextInt(15)));
+        this.setLifetime((int) (8.0d * randy.nextInt(15)));
     }
 
     protected void setMotion(double x, double y, double z) {
-        this.motionX = x;
-        this.motionY = y;
-        this.motionZ = z;
+        this.xd = x;
+        this.yd = y;
+        this.zd = z;
     }
 
     @Override
@@ -44,16 +44,16 @@ public class EtherParticle extends SpriteTexturedParticle {
     }
     @Override
     public void tick() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        if (this.maxAge-- <= 0) {
-            this.setExpired();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.lifetime-- <= 0) {
+            this.remove();
         } else {
-            this.move(this.motionX, this.motionY, this.motionZ);
-            this.motionX *= 1.0d;
-            this.motionY *= 1.0d;
-            this.motionZ *= 1.0d;
+            this.move(this.xd, this.yd, this.zd);
+            this.xd *= 1.0d;
+            this.yd *= 1.0d;
+            this.zd *= 1.0d;
         }
     }
 }

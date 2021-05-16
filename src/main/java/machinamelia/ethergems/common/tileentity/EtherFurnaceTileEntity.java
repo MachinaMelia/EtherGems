@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.tileentity;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -10,6 +10,7 @@ package machinamelia.ethergems.common.tileentity;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.util.GemHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
@@ -43,7 +44,6 @@ import machinamelia.ethergems.common.network.NetworkHandler;
 import machinamelia.ethergems.common.network.server.AddCylindersToConfirmMessage;
 import machinamelia.ethergems.common.network.server.AddGemsToConfirmMessage;
 import machinamelia.ethergems.common.util.CylinderHandler;
-import machinamelia.ethergems.common.util.GemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -370,10 +370,10 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     }
 
     private void playSound(SoundEvent sound) {
-        double dx = (double) this.pos.getX() + 0.5d;
-        double dy = (double) this.pos.getY() + 0.5d;
-        double dz = (double) this.pos.getZ() + 0.5d;
-        this.world.playSound((PlayerEntity) null, dx, dy, dz, sound, SoundCategory.BLOCKS, 0.5f, this.world.rand.nextFloat() * 0.1f + 0.9f);
+        double dx = (double) this.getBlockPos().getX() + 0.5d;
+        double dy = (double) this.getBlockPos().getY() + 0.5d;
+        double dz = (double) this.getBlockPos().getZ() + 0.5d;
+        this.level.playSound((PlayerEntity) null, dx, dy, dz, sound, SoundCategory.BLOCKS, 0.5f, this.level.random.nextFloat() * 0.1f + 0.9f);
     }
 
     public static void swapContents(EtherFurnaceTileEntity te, EtherFurnaceTileEntity otherTe) {
@@ -385,7 +385,7 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     public static int getPlayersUsing(IBlockReader reader, BlockPos pos) {
         BlockState blockstate = reader.getBlockState(pos);
         if (blockstate.hasTileEntity()) {
-            TileEntity tileEntity = reader.getTileEntity(pos);
+            TileEntity tileEntity = reader.getBlockEntity(pos);
             if (tileEntity instanceof EtherFurnaceTileEntity) {
                 return ((EtherFurnaceTileEntity) tileEntity).numPlayersUsing;
             }
@@ -395,48 +395,48 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        read(pkt.getNbtCompound());
+        load(this.getBlockState(), pkt.getTag());
     }
 
     @Override
     public CompoundNBT getUpdateTag()
     {
         CompoundNBT nbtTagCompound = new CompoundNBT();
-        nbtTagCompound = write(nbtTagCompound);
+        nbtTagCompound = save(nbtTagCompound);
         return nbtTagCompound;
     }
 
-    @Override
-    public void handleUpdateTag(CompoundNBT tag)
-    {
-        this.read(tag);
-    }
+//    @Override
+//    public void handleUpdateTag(CompoundNBT tag)
+//    {
+//        this.read(tag);
+//    }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
-        if (!this.checkLootAndWrite(compound)) {
+    public CompoundNBT save(CompoundNBT compound) {
+        super.save(compound);
+        if (!this.trySaveLootTable(compound)) {
             ItemStackHelper.saveAllItems(compound, this.furnaceContents);
         }
         return compound;
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
-        this.furnaceContents = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
-        if (!this.checkLootAndRead(compound)) {
+    public void load(BlockState blockState, CompoundNBT compound) {
+        super.load(blockState, compound);
+        this.furnaceContents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        if (!this.trySaveLootTable(compound)) {
             ItemStackHelper.loadAllItems(compound, this.furnaceContents);
         }
     }
 
     @Override
-    public boolean receiveClientEvent(int id, int type) {
+    public boolean triggerEvent(int id, int type) {
         if (id == 1) {
             this.numPlayersUsing = type;
             return true;
         } else {
-            return super.receiveClientEvent(id, type);
+            return super.triggerEvent(id, type);
         }
     }
 
@@ -459,13 +459,13 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     public SUpdateTileEntityPacket getUpdatePacket()
     {
         CompoundNBT nbtTagCompound = new CompoundNBT();
-        write(nbtTagCompound);
+        save(nbtTagCompound);
         int tileEntityType = 42;  // arbitrary number; only used for vanilla TileEntities.  You can use it, or not, as you want.
-        return new SUpdateTileEntityPacket(this.pos, tileEntityType, nbtTagCompound);
+        return new SUpdateTileEntityPacket(this.getBlockPos(), tileEntityType, nbtTagCompound);
     }
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) {
+    public boolean canPlaceItem(int index, ItemStack stack) {
         if (this.isSlotsDisabled && index >= 36) {
             return false;
         }
@@ -478,8 +478,8 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     }
 
     @Override
-    public void updateContainingBlockInfo() {
-        super.updateContainingBlockInfo();
+    public void clearCache() {
+        super.clearCache();
         if (this.itemHandler != null) {
             this.itemHandler.invalidate();
             this.itemHandler = null;
@@ -487,8 +487,8 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void setRemoved() {
+        super.setRemoved();
         if (itemHandler != null) {
             itemHandler.invalidate();
         }
@@ -571,7 +571,7 @@ public class EtherFurnaceTileEntity extends LockableLootTileEntity implements IT
     public ArrayList<Integer> getAmountList() { return this.amountList; }
 
     @Override
-    public int getSizeInventory() {
+    public int getContainerSize() {
         return 44;
     }
 

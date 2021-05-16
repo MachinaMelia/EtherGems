@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.events;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -32,7 +32,7 @@ import machinamelia.ethergems.common.items.armor.material.SlottedArmor;
 import machinamelia.ethergems.common.items.weapon.SlottedAxe;
 import machinamelia.ethergems.common.items.weapon.SlottedSword;
 
-@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EtherGems.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CraftItemEvents {
     @SubscribeEvent
     public static void getCraftedEvent(PlayerEvent.ItemCraftedEvent event) {
@@ -43,7 +43,7 @@ public class CraftItemEvents {
             ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
             if (!armor.getHasInited()) {
                 armor.init();
-                event.getInventory().markDirty();
+                event.getInventory().setChanged();
             }
         }
         if (item instanceof SlottedSword || item instanceof SlottedAxe) {
@@ -51,7 +51,7 @@ public class CraftItemEvents {
             ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
             if (!weapon.getHasInited()) {
                 weapon.init();
-                event.getInventory().markDirty();
+                event.getInventory().setChanged();
             }
         }
     }
@@ -59,9 +59,9 @@ public class CraftItemEvents {
     public static void craftingContainerEvent(PlayerContainerEvent event) {
         if (event.getContainer() instanceof WorkbenchContainer) {
             WorkbenchContainer workbenchContainer = (WorkbenchContainer) event.getContainer();
-            workbenchContainer.addListener(new IContainerListener() {
+            workbenchContainer.addSlotListener(new IContainerListener() {
                 @Override
-                public void sendAllContents(Container containerToSend, NonNullList<ItemStack> itemsList) {
+                public void refreshContainer(Container containerToSend, NonNullList<ItemStack> itemsList) {
                     for (int i = 0; i < itemsList.size(); i++) {
                         ItemStack itemStack = itemsList.get(i);
                         if (itemStack.getItem() instanceof SlottedArmor) {
@@ -84,12 +84,12 @@ public class CraftItemEvents {
                                 }
                             }
                         }
-                        containerToSend.putStackInSlot(i, itemsList.get(i));
+                        containerToSend.setItem(i, itemsList.get(i));
                     }
                 }
 
                 @Override
-                public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack) {
+                public void slotChanged(Container containerToSend, int slotInd, ItemStack stack) {
                     if (containerToSend.getSlot(slotInd) != null) {
                         if (stack.getItem() instanceof SlottedArmor) {
                             LazyOptional<ISlottedArmor> armorCapability = stack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
@@ -111,12 +111,12 @@ public class CraftItemEvents {
                                 }
                             }
                         }
-                        containerToSend.putStackInSlot(slotInd, stack);
+                        containerToSend.setItem(slotInd, stack);
                     }
                 }
 
                 @Override
-                public void sendWindowProperty(Container containerIn, int varToUpdate, int newValue) {
+                public void setContainerData(Container containerIn, int varToUpdate, int newValue) {
 
                 }
             });
@@ -158,44 +158,44 @@ public class CraftItemEvents {
     public static ItemStack resetItem(ItemStack stack, ISlottedArmor armor) {
         if (stack.getItem() instanceof SlottedArmor) {
             ArmorItem armorItem = (ArmorItem) stack.getItem();
-            if (armorItem.getArmorMaterial().equals(ArmorMaterial.LEATHER)) {
-                if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.HEAD)) {
+            if (armorItem.getMaterial().equals(ArmorMaterial.LEATHER)) {
+                if (armorItem.getSlot().equals(EquipmentSlotType.HEAD)) {
                     stack = new ItemStack(Items.LEATHER_HELMET);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.CHEST)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.CHEST)) {
                     stack = new ItemStack(Items.LEATHER_CHESTPLATE);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.LEGS)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.LEGS)) {
                     stack = new ItemStack(Items.LEATHER_LEGGINGS);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.FEET)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
                     stack = new ItemStack(Items.LEATHER_BOOTS);
                 }
-            } else if (armorItem.getArmorMaterial().equals(ArmorMaterial.IRON)) {
-                if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.HEAD)) {
+            } else if (armorItem.getMaterial().equals(ArmorMaterial.IRON)) {
+                if (armorItem.getSlot().equals(EquipmentSlotType.HEAD)) {
                     stack = new ItemStack(Items.IRON_HELMET);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.CHEST)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.CHEST)) {
                     stack = new ItemStack(Items.IRON_CHESTPLATE);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.LEGS)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.LEGS)) {
                     stack = new ItemStack(Items.IRON_LEGGINGS);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.FEET)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
                     stack = new ItemStack(Items.IRON_BOOTS);
                 }
-            } else if (armorItem.getArmorMaterial().equals(ArmorMaterial.GOLD)) {
-                if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.HEAD)) {
+            } else if (armorItem.getMaterial().equals(ArmorMaterial.GOLD)) {
+                if (armorItem.getSlot().equals(EquipmentSlotType.HEAD)) {
                     stack = new ItemStack(Items.GOLDEN_HELMET);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.CHEST)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.CHEST)) {
                     stack = new ItemStack(Items.GOLDEN_CHESTPLATE);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.LEGS)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.LEGS)) {
                     stack = new ItemStack(Items.GOLDEN_LEGGINGS);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.FEET)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
                     stack = new ItemStack(Items.GOLDEN_BOOTS);
                 }
-            } else if (armorItem.getArmorMaterial().equals(ArmorMaterial.DIAMOND)) {
-                if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.HEAD)) {
+            } else if (armorItem.getMaterial().equals(ArmorMaterial.DIAMOND)) {
+                if (armorItem.getSlot().equals(EquipmentSlotType.HEAD)) {
                     stack = new ItemStack(Items.DIAMOND_HELMET);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.CHEST)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.CHEST)) {
                     stack = new ItemStack(Items.DIAMOND_CHESTPLATE);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.LEGS)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.LEGS)) {
                     stack = new ItemStack(Items.DIAMOND_LEGGINGS);
-                } else if (armorItem.getEquipmentSlot().equals(EquipmentSlotType.FEET)) {
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
                     stack = new ItemStack(Items.DIAMOND_BOOTS);
                 }
             }

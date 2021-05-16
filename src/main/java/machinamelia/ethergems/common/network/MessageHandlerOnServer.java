@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.network;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -71,7 +71,7 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(OpenCrystalInventoryMessage message, ServerPlayerEntity sendingPlayer)
     {
-        NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Crystal Inventory"), (i, inv, p) -> new CrystalInventoryContainer(ContainerInit.CRYSTAL_INVENTORY_CONTAINER.get(), i, sendingPlayer)));
+        NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new CrystalInventoryContainer(ContainerInit.CRYSTAL_INVENTORY_CONTAINER.get(), i, sendingPlayer)));
         return;
     }
     public static void onMessageReceived(final OpenGemInventoryMessage message, Supplier<NetworkEvent.Context> ctxSupplier) {
@@ -97,7 +97,7 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(OpenGemInventoryMessage message, ServerPlayerEntity sendingPlayer)
     {
-        NetworkHooks.openGui(sendingPlayer , new ContainerProvider(new StringTextComponent("Gem Inventory"), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, sendingPlayer)));
+        NetworkHooks.openGui(sendingPlayer , new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new GemInventoryContainer(ContainerInit.GEM_INVENTORY_CONTAINER.get(), i, sendingPlayer)));
         return;
     }
     public static void onMessageReceived(final OpenOptionsContainerMessage message, Supplier<NetworkEvent.Context> ctxSupplier) {
@@ -123,15 +123,15 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(OpenOptionsContainerMessage message, ServerPlayerEntity sendingPlayer)
     {
-        if (sendingPlayer.openContainer instanceof EtherFurnaceInventoryContainer) {
+        if (sendingPlayer.containerMenu instanceof EtherFurnaceInventoryContainer) {
             ItemStack[] items = message.getItems();
             CompoundNBT compoundNBT = new CompoundNBT();
             compoundNBT.put("Items", writeItemStacksToTag(items, 44));
             compoundNBT.putByte("size", (byte) 44);
             sendingPlayer.getPersistentData().put("crystal_inventory", compoundNBT);
-            EtherFurnaceInventoryContainer inventoryContainer = (EtherFurnaceInventoryContainer) sendingPlayer.openContainer;
+            EtherFurnaceInventoryContainer inventoryContainer = (EtherFurnaceInventoryContainer) sendingPlayer.containerMenu;
             inventoryContainer.getTileEntity().setIsLocked(true);
-            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceOptionsContainer(i, inv, inventoryContainer.getTileEntity())), inventoryContainer.getTileEntity().getPos());
+            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new EtherFurnaceOptionsContainer(i, inv, inventoryContainer.getTileEntity())), inventoryContainer.getTileEntity().getBlockPos());
         }
         return;
     }
@@ -158,16 +158,16 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(OpenCraftingContainerMessage message, ServerPlayerEntity sendingPlayer)
     {
-        if (sendingPlayer.openContainer instanceof EtherFurnaceOptionsContainer) {
-            EtherFurnaceOptionsContainer optionsContainer = (EtherFurnaceOptionsContainer) sendingPlayer.openContainer;
+        if (sendingPlayer.containerMenu instanceof EtherFurnaceOptionsContainer) {
+            EtherFurnaceOptionsContainer optionsContainer = (EtherFurnaceOptionsContainer) sendingPlayer.containerMenu;
             optionsContainer.getTileEntity().setIsLocked(true);
-            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceCraftingContainer(i, inv, optionsContainer.getTileEntity())), optionsContainer.getTileEntity().getPos());
+            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new EtherFurnaceCraftingContainer(i, inv, optionsContainer.getTileEntity())), optionsContainer.getTileEntity().getBlockPos());
         }
         return;
     }
 
     public static void openGemConfirmContainer(ServerPlayerEntity sendingPlayer) {
-        if (sendingPlayer.openContainer instanceof EtherFurnaceCylinderConfirmContainer) {
+        if (sendingPlayer.containerMenu instanceof EtherFurnaceCylinderConfirmContainer) {
             boolean shouldClose = false;
             CompoundNBT compoundNBT = (CompoundNBT) sendingPlayer.getPersistentData().get("gem_confirm_inventory");
             ItemStack[] items = new ItemStack[27];
@@ -186,13 +186,13 @@ public class MessageHandlerOnServer {
                     }
                 }
             }
-            EtherFurnaceCylinderConfirmContainer craftingContainer = (EtherFurnaceCylinderConfirmContainer) sendingPlayer.openContainer;
+            EtherFurnaceCylinderConfirmContainer craftingContainer = (EtherFurnaceCylinderConfirmContainer) sendingPlayer.containerMenu;
             if (!shouldClose) {
                 craftingContainer.getTileEntity().setIsLocked(true);
-                NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceGemConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getPos());
+                NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new EtherFurnaceGemConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getBlockPos());
             } else {
                 craftingContainer.getTileEntity().setIsLocked(false);
-                sendingPlayer.closeScreen();
+                sendingPlayer.closeContainer();
             }
         }
     }
@@ -223,10 +223,10 @@ public class MessageHandlerOnServer {
         return;
     }
     public static void openCylinderConfirmContainer(ServerPlayerEntity sendingPlayer) {
-        if (sendingPlayer.openContainer instanceof EtherFurnaceCraftingContainer) {
-            EtherFurnaceCraftingContainer craftingContainer = (EtherFurnaceCraftingContainer) sendingPlayer.openContainer;
+        if (sendingPlayer.containerMenu instanceof EtherFurnaceCraftingContainer) {
+            EtherFurnaceCraftingContainer craftingContainer = (EtherFurnaceCraftingContainer) sendingPlayer.containerMenu;
             craftingContainer.getTileEntity().setIsLocked(true);
-            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent("Test"), (i, inv, p) -> new EtherFurnaceCylinderConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getPos());
+            NetworkHooks.openGui(sendingPlayer, new ContainerProvider(new StringTextComponent(""), (i, inv, p) -> new EtherFurnaceCylinderConfirmContainer(i, inv, craftingContainer.getTileEntity())), craftingContainer.getTileEntity().getBlockPos());
         }
     }
     public static void onMessageReceived(final OpenCylinderConfirmContainerMessage message, Supplier<NetworkEvent.Context> ctxSupplier) {
@@ -461,9 +461,10 @@ public class MessageHandlerOnServer {
     static void processMessage(SendMessageToAllPlayersMessage message, ServerPlayerEntity sendingPlayer)
     {
        String string = message.getMessage();
-       List<ServerPlayerEntity> players = sendingPlayer.getServerWorld().getPlayers();
-       for (ServerPlayerEntity player : players) {
-           player.sendMessage(new StringTextComponent(string));
+       List<? extends PlayerEntity> players = sendingPlayer.getCommandSenderWorld().players();
+       for (PlayerEntity player : players) {
+           ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+           serverPlayer.sendMessage(new StringTextComponent(string), serverPlayer.getUUID());
        }
 
         return;
@@ -492,26 +493,31 @@ public class MessageHandlerOnServer {
     static void processMessage(SendArmorGemToServerMessage message, ServerPlayerEntity sendingPlayer)
     {
         if (message.index < 4) {
-            Iterator<ItemStack> armorList = sendingPlayer.getArmorInventoryList().iterator();
+            Iterator<ItemStack> armorList = sendingPlayer.getArmorSlots().iterator();
             for (int i = 0; i < 4; i++) {
                 ItemStack armor = armorList.next();
                 if (message.index == i) {
                     LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
                     try {
                         ISlottedArmor armorInstance = armorCapability.orElseThrow(IllegalStateException::new);
-                        armorInstance.setGem(message.armorGem);
+                        if (armorInstance.getSlots() > 0) {
+                            if (!message.isCompatible) {
+                                armorInstance.setIsWrongGem(true);
+                            } else {
+                                armorInstance.setGem(message.armorGem);
+                            }
+                        }
                     } catch (IllegalStateException e) {
                     }
                 }
             }
         } else {
-            ItemStack weapon = sendingPlayer.getHeldItemMainhand();
+            ItemStack weapon = sendingPlayer.getMainHandItem();
             if (weapon.getItem() instanceof SlottedSword || weapon.getItem() instanceof SlottedAxe) {
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 try {
                     ISlottedWeapon weaponInstance = weaponCapability.orElseThrow(IllegalStateException::new);
                     if (weaponInstance.getSlots() > message.index - 4) {
-
                         if (!message.isCompatible) {
                             weaponInstance.setIsWrongGem(true);
                         } else {
@@ -547,10 +553,11 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(SendParticleToServerWorldMessage message, ServerPlayerEntity sendingPlayer)
     {
-        List<ServerPlayerEntity> players = sendingPlayer.getServerWorld().getPlayers();
-        for (ServerPlayerEntity player : players) {
-            RenderParticleOnClientMessage msg = new RenderParticleOnClientMessage(player.getUniqueID().toString(), message.type, message.x, message.y, message.z, message.xSpeed, message.ySpeed, message.zSpeed);
-            NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), msg);
+        List<? extends PlayerEntity> players = sendingPlayer.getCommandSenderWorld().players();
+        for (PlayerEntity player : players) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            RenderParticleOnClientMessage msg = new RenderParticleOnClientMessage(serverPlayer.getStringUUID(), message.type, message.x, message.y, message.z, message.xSpeed, message.ySpeed, message.zSpeed, 0);
+            NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
         }
 
         return;
@@ -578,7 +585,7 @@ public class MessageHandlerOnServer {
     }
     static void processMessage(SendDoubleAttackToServerMessage message, ServerPlayerEntity sendingPlayer)
     {
-        Entity entity = sendingPlayer.world.getEntityByID(message.entityId);
+        Entity entity = sendingPlayer.level.getEntity(message.entityId);
         if (entity instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) entity;
             PlayerEntity player = (PlayerEntity) sendingPlayer;

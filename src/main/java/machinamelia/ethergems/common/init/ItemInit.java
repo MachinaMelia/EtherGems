@@ -1,7 +1,7 @@
 package machinamelia.ethergems.common.init;
 
 /*
- *   Copyright (C) 2020 MachinaMelia
+ *   Copyright (C) 2020-2021 MachinaMelia
  *
  *    This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
  *
@@ -28,7 +28,7 @@ import machinamelia.ethergems.common.items.weapon.SlottedAxe;
 import machinamelia.ethergems.common.items.weapon.SlottedSword;
 
 public class ItemInit {
-    public static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, EtherGems.MOD_ID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, EtherGems.MOD_ID);
 
     // Items
     public static final RegistryObject<Item> FIRE_CRYSTAL = ITEMS.register("fire_crystal", FireCrystal::new);
