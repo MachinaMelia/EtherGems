@@ -1,7 +1,7 @@
  
     modLoader="javafml"
     
-    loaderVersion="[31,)"
+    loaderVersion="[36,)"
    
     issueTrackerURL="https://github.com/MachinaMelia/EtherGems/issues"
     
@@ -24,20 +24,20 @@
      [[dependencies.ethergems]]
       modId="polymorph"
       mandatory=true
-      versionRange="[1.16.5-0.24,)"
+      versionRange="[1.16.5-0.40,)"
       ordering="NONE"
       side="BOTH"
 
       [[dependencies.ethergems]]
         modId="forge"
         mandatory=true
-        versionRange="[36.1.0,)"
+        versionRange="[36.2.34,)"
         ordering="NONE"
         side="BOTH"
 
       [[dependencies.ethergems]]
         modId="minecraft"
         mandatory=true
-        versionRange="[1.16.5]"
+        versionRange="[1.16.5, 1.17)"
         ordering="NONE"
         side="BOTH"
