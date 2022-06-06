@@ -94,53 +94,6 @@ public class UpdatedInventoryScreen extends InventoryScreen {
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
             }
-            if (slotId < 9 && slotId > 4) {
-                CompoundNBT compoundNBT = (CompoundNBT) this.player.getPersistentData().get("gem_inventory");
-                ItemStack[] items = new ItemStack[44];
-                if (compoundNBT != null) {
-                    ListNBT listNBT = (ListNBT) compoundNBT.get("Items");
-                    readItemStacksFromTag(items, listNBT);
-                }
-                boolean isRemoving = this.player.getPersistentData().getBoolean("isRemoving");
-                boolean hasPlaced = false;
-                if (slotIn.getItem().getItem() instanceof SlottedArmor) {
-                    ItemStack armor = slotIn.getItem();
-                    LazyOptional<ISlottedArmor> armorCapability = armor.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-                    ISlottedArmor armorInstance = armorCapability.orElse(new SlottedArmorInstance());
-                    if (armorInstance.getGem() == null || armorInstance.getGem() != null && armorInstance.getGem().getItem().equals(Items.AIR)) {
-                        if (items[(slotId - 5) + 37] != null && !items[(slotId - 5) + 37].getItem().equals(Items.AIR)) {
-                            armorInstance.setGem(items[(slotId - 5) + 37]);
-                            SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(items[(slotId - 5) + 37], (slotId - 5), true);
-                            NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
-                        }
-                        if (isRemoving) {
-                            isRemoving = false;
-                        }
-                    } else if (items[(slotId - 5) + 37] != null && items[(slotId - 5) + 37].getItem() == null || items[(slotId - 5) + 37].getItem() != null && items[(slotId - 5) + 37].getItem().equals(Items.AIR)) {
-                        items[(slotId - 5) + 37] = armorInstance.getGem();
-                    }
-                } else {
-                    ItemStack[] gems = new ItemStack[1];
-                    gems[0] = items[(slotId - 5) + 37];
-                    isRemoving = true;
-                    if (hasPlaced) {
-                        PutGemsInInventoryMessage putGemsInInventoryMessage = new PutGemsInInventoryMessage(gems);
-                        NetworkHandler.simpleChannel.sendToServer(putGemsInInventoryMessage);
-                        this.player.getPersistentData().putBoolean("isRemoving", isRemoving);
-                    }
-                }
-            }
-            if (slotIn != null && slotIn.hasItem() && (slotIn.getItem().getItem() instanceof SlottedSword || slotIn.getItem().getItem() instanceof SlottedAxe)) {
-                if (this.gems != null) {
-                    ItemStack weapon = slotIn.getItem();
-                    LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
-                    ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
-                    weaponInstance.setSlots(gems.length);
-                    for (int i = 0; i < gems.length; i++) {
-                        weaponInstance.setGem(i, gems[i]);
-                    }
-                }
-            }
             if (player.getMainHandItem().getItem() instanceof SlottedSword || player.getMainHandItem().getItem() instanceof SlottedAxe) {
                 ItemStack weapon = player.getMainHandItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);

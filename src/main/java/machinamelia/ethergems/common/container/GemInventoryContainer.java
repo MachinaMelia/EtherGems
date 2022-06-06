@@ -180,44 +180,37 @@ public class GemInventoryContainer extends Container {
                 this.setItem(slotId, ItemStack.EMPTY);
             }
             ItemStack[] itemStacks = new ItemStack[44];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 44; i++) {
                 itemStacks[i] = this.items.getStackInSlot(i);
             }
             itemStacks[36] = ItemStack.EMPTY;
-            int spaces = 0;
-            for (int i = 0; i < 4; i++) {
-                if (this.hasArmor[i]) {
-                    itemStacks[i + 37] = this.items.getStackInSlot(i + 37 - spaces);
-                } else {
-                     spaces++;
-                }
-            }
             if (swordSlots > 0) {
                 for (int i = 0; i < swordSlots; i++) {
                     itemStacks[i + 41] = this.items.getStackInSlot(i + this.size);
                 }
             }
-            if (slotId >= this.size && clickTypeIn.equals(ClickType.PICKUP)) {
+            if (slotId >= this.size && (clickTypeIn.equals(ClickType.PICKUP) | clickTypeIn.equals(ClickType.SWAP))) {
                 ItemStack weapon = player.getMainHandItem();
                 LazyOptional<ISlottedWeapon> weaponCapability = weapon.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
                 ISlottedWeapon weaponInstance = weaponCapability.orElse(new SlottedWeaponInstance());
 
-                if (itemStacks[41 + (slotId - this.size)] != null) {
-                    if (player.level.isClientSide) {
-                        SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(itemStacks[41 + (slotId - this.size)], 4 + slotId, true);
-                        NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
-                    } else {
-                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), itemStacks[41 + (slotId - this.size)], 4 + (slotId - this.size));
-                        NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
-                    }
-                }
-                else {
-                    if (player.level.isClientSide) {
-                        SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(ItemStack.EMPTY, 4 + slotId, true);
-                        NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
-                    } else {
-                        SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), ItemStack.EMPTY, 4 + slotId);
-                        NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                for (int i = 0; i < 4; i++) {
+                    if (hasArmor[i]) {
+                        if (player.level.isClientSide) {
+                            SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(itemStacks[i + 37], i, true);
+                            NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
+                        } else {
+                            SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), itemStacks[i + 37], i);
+                            NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                        }
+                } else {
+                        if (player.level.isClientSide) {
+                            SendArmorGemToServerMessage sendArmorGemToServerMessage = new SendArmorGemToServerMessage(ItemStack.EMPTY, i, true);
+                            NetworkHandler.simpleChannel.sendToServer(sendArmorGemToServerMessage);
+                        } else {
+                            SendArmorGemToClientMessage msg = new SendArmorGemToClientMessage(player.getStringUUID(), ItemStack.EMPTY, i);
+                            NetworkHandler.simpleChannel.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
+                        }
                     }
                 }
             }
