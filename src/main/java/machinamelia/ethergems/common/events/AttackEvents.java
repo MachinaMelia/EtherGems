@@ -11,7 +11,6 @@ package machinamelia.ethergems.common.events;
  */
 
 import machinamelia.ethergems.common.network.client.RenderParticleOnClientMessage;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -116,7 +115,6 @@ public class AttackEvents {
                 if (backAttack > 4.5) {
                     backAttack = 4.5;
                 }
-                System.out.println("Is Back Attack!");
                 double d0 = (double) (-MathHelper.sin(player.yRot * ((float) Math.PI / 180F)));
                 double d1 = (double) MathHelper.cos(player.yRot * ((float) Math.PI / 180F));
                 if (player.level.isClientSide && backAttack > 0) {
@@ -144,20 +142,14 @@ public class AttackEvents {
             double fullStrength = GemHandler.getPlayerGemStrength(player, "Critical Up");
             Random randy = new Random();
             int roll = randy.nextInt(100);
-            if (!player.level.isClientSide && roll < fullStrength) {
+            if (roll < fullStrength) {
                 player.level.playSound((PlayerEntity) null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_CRIT, player.getSoundSource(), 1.0F, 1.0F);
-                ClientPlayerEntity clientPlayer = (ClientPlayerEntity) player;
-                clientPlayer.crit(target);
-                System.out.println("Crit animation!");
+                player.crit(target);
             }
             if (roll < fullStrength) {
-                System.out.println("Is Crit: " + roll + ", " + fullStrength);
-                System.out.println("Back Attack: " + backAttack);
                 net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(player, target, true, true ? 1.5F : 1.0F);
                 target.hurt(DamageSource.playerAttack(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) * 1.5F - target.getArmorValue() + (float) (physDefDown * 0.5));
             } else {
-                System.out.println("Not Crit: " + roll + ", " + fullStrength);
-                System.out.println("Back Attack: " + backAttack);
                 target.hurt(DamageSource.playerAttack(player), ((float) strengthUp + (float) firstAttack + (float) backAttack + (1 + weaponBaseDamage)) - target.getArmorValue() + (float) (physDefDown * 0.5));
             }
         }
