@@ -10,7 +10,7 @@
   {
     "x":
     {
-      "item": "minecraft:cobblestone"
+      "tag": "minecraft:stone_crafting_materials"
 
     },
     "y":
