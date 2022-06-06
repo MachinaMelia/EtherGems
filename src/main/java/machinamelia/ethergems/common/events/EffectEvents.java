@@ -12,10 +12,9 @@ package machinamelia.ethergems.common.events;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.BlazeEntity;
-import net.minecraft.entity.monster.MagmaCubeEntity;
-import net.minecraft.entity.monster.WitherSkeletonEntity;
-import net.minecraft.entity.monster.ZombifiedPiglinEntity;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.monster.piglin.PiglinEntity;
+import net.minecraft.entity.passive.StriderEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -129,7 +128,7 @@ public class EffectEvents {
         Entity entity = event.getEntity();
         if (entity instanceof LivingEntity) {
             LivingEntity livingEntity = (LivingEntity) entity;
-            if (!(livingEntity instanceof BlazeEntity || livingEntity instanceof ZombifiedPiglinEntity || livingEntity instanceof MagmaCubeEntity || livingEntity instanceof WitherSkeletonEntity)) {
+            if (!(livingEntity instanceof BlazeEntity || livingEntity instanceof ZombifiedPiglinEntity || livingEntity instanceof ZoglinEntity || livingEntity instanceof StriderEntity || livingEntity instanceof MagmaCubeEntity || livingEntity instanceof WitherSkeletonEntity)) {
                 double fullStrength = entity.getPersistentData().getDouble("blaze_plus_damage");
                 if (fullStrength > 0.0 && entityTickCounter <= 0) {
                     if (livingEntity.isOnFire()) {
