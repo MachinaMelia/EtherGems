@@ -110,16 +110,22 @@ public class ItemInit {
     public static final RegistryObject<SlottedArmor> SLOTTED_DIAMOND_CHESTPLATE = ITEMS.register("slotted_diamond_chestplate", () -> new SlottedArmor(ArmorMaterial.DIAMOND, EquipmentSlotType.CHEST, (new Item.Properties())));
     public static final RegistryObject<SlottedArmor> SLOTTED_DIAMOND_LEGGINGS = ITEMS.register("slotted_diamond_leggings", () -> new SlottedArmor(ArmorMaterial.DIAMOND, EquipmentSlotType.LEGS, (new Item.Properties())));
     public static final RegistryObject<SlottedArmor> SLOTTED_DIAMOND_BOOTS = ITEMS.register("slotted_diamond_boots", () -> new SlottedArmor(ArmorMaterial.DIAMOND, EquipmentSlotType.FEET, (new Item.Properties())));
+    public static final RegistryObject<SlottedArmor> SLOTTED_NETHERITE_HELMET = ITEMS.register("slotted_netherite_helmet", () -> new SlottedArmor(ArmorMaterial.NETHERITE, EquipmentSlotType.HEAD, (new Item.Properties()).fireResistant()));
+    public static final RegistryObject<SlottedArmor> SLOTTED_NETHERITE_CHESTPLATE = ITEMS.register("slotted_netherite_chestplate", () -> new SlottedArmor(ArmorMaterial.NETHERITE, EquipmentSlotType.CHEST, (new Item.Properties()).fireResistant()));
+    public static final RegistryObject<SlottedArmor> SLOTTED_NETHERITE_LEGGINGS = ITEMS.register("slotted_netherite_leggings", () -> new SlottedArmor(ArmorMaterial.NETHERITE, EquipmentSlotType.LEGS, (new Item.Properties()).fireResistant()));
+    public static final RegistryObject<SlottedArmor> SLOTTED_NETHERITE_BOOTS = ITEMS.register("slotted_netherite_boots", () -> new SlottedArmor(ArmorMaterial.NETHERITE, EquipmentSlotType.FEET, (new Item.Properties()).fireResistant()));
     public static final RegistryObject<SlottedSword> SLOTTED_WOODEN_SWORD = ITEMS.register("slotted_wooden_sword", () -> new SlottedSword(ItemTier.WOOD, 3, -2.4F, (new Item.Properties())));
     public static final RegistryObject<SlottedSword> SLOTTED_STONE_SWORD = ITEMS.register("slotted_stone_sword", () -> new SlottedSword(ItemTier.STONE, 3, -2.4F, (new Item.Properties())));
     public static final RegistryObject<SlottedSword> SLOTTED_IRON_SWORD = ITEMS.register("slotted_iron_sword", () -> new SlottedSword(ItemTier.IRON, 3, -2.4F, (new Item.Properties())));
     public static final RegistryObject<SlottedSword> SLOTTED_GOLDEN_SWORD = ITEMS.register("slotted_golden_sword", () -> new SlottedSword(ItemTier.GOLD, 3, -2.4F, (new Item.Properties())));
     public static final RegistryObject<SlottedSword> SLOTTED_DIAMOND_SWORD = ITEMS.register("slotted_diamond_sword", () -> new SlottedSword(ItemTier.DIAMOND, 3, -2.4F, (new Item.Properties())));
+    public static final RegistryObject<SlottedSword> SLOTTED_NETHERITE_SWORD = ITEMS.register("slotted_netherite_sword", () -> new SlottedSword(ItemTier.NETHERITE, 3, -2.4F, (new Item.Properties()).fireResistant()));
     public static final RegistryObject<SlottedAxe> SLOTTED_WOODEN_AXE = ITEMS.register("slotted_wooden_axe", () -> new SlottedAxe(ItemTier.WOOD, 6.0F, -3.2F, (new Item.Properties())));
     public static final RegistryObject<SlottedAxe> SLOTTED_STONE_AXE = ITEMS.register("slotted_stone_axe", () -> new SlottedAxe(ItemTier.STONE, 7.0F, -3.2F, (new Item.Properties())));
     public static final RegistryObject<SlottedAxe> SLOTTED_IRON_AXE = ITEMS.register("slotted_iron_axe", () -> new SlottedAxe(ItemTier.IRON, 6.0F, -3.1F, (new Item.Properties())));
     public static final RegistryObject<SlottedAxe> SLOTTED_GOLDEN_AXE = ITEMS.register("slotted_golden_axe", () -> new SlottedAxe(ItemTier.GOLD, 6.0F, -3.0F, (new Item.Properties())));
     public static final RegistryObject<SlottedAxe> SLOTTED_DIAMOND_AXE = ITEMS.register("slotted_diamond_axe", () -> new SlottedAxe(ItemTier.DIAMOND, 5.0F, -3.0F, (new Item.Properties())));
+    public static final RegistryObject<SlottedAxe> SLOTTED_NETHERITE_AXE = ITEMS.register("slotted_netherite_axe", () -> new SlottedAxe(ItemTier.NETHERITE, 5.0F, -3.0F, (new Item.Properties()).fireResistant()));
     public static final RegistryObject<SlottedSword> MONADO = ITEMS.register("monado", () -> new SlottedSword(EtherGemsItemTier.MONADO, 4, -2.4F, (new Item.Properties())));
 
 }

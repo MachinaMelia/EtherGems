@@ -10,6 +10,7 @@ package machinamelia.ethergems.common.events;
  *    You should have received a copy of the GNU Lesser General Public License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import machinamelia.ethergems.common.capabilities.armor.material.*;
 import net.minecraft.item.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -17,10 +18,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import machinamelia.ethergems.common.EtherGems;
 import machinamelia.ethergems.common.capabilities.armor.SlottedArmorProvider;
-import machinamelia.ethergems.common.capabilities.armor.material.SlottedDiamondArmorProvider;
-import machinamelia.ethergems.common.capabilities.armor.material.SlottedGoldenArmorProvider;
-import machinamelia.ethergems.common.capabilities.armor.material.SlottedIronArmorProvider;
-import machinamelia.ethergems.common.capabilities.armor.material.SlottedLeatherArmorProvider;
 import machinamelia.ethergems.common.capabilities.crystals.CrystalProvider;
 import machinamelia.ethergems.common.capabilities.crystals.elemental.*;
 import machinamelia.ethergems.common.capabilities.cylinders.CylinderProvider;
@@ -82,6 +79,8 @@ public class CapabilityEvents {
                 event.addCapability(ARMOR_CAPABILITY, new SlottedGoldenArmorProvider());
             } else if (material.equals(ArmorMaterial.DIAMOND)) {
                 event.addCapability(ARMOR_CAPABILITY, new SlottedDiamondArmorProvider());
+            } else if (material.equals(ArmorMaterial.NETHERITE)) {
+                event.addCapability(ARMOR_CAPABILITY, new SlottedNetheriteArmorProvider());
             } else {
                 event.addCapability(ARMOR_CAPABILITY, new SlottedArmorProvider());
             }
@@ -99,6 +98,8 @@ public class CapabilityEvents {
                 event.addCapability(WEAPON_CAPABILITY, new SlottedGoldWeaponProvider());
             } else if (material.equals(ItemTier.DIAMOND)) {
                 event.addCapability(WEAPON_CAPABILITY, new SlottedDiamondWeaponProvider());
+            } else if (material.equals(ItemTier.NETHERITE)) {
+                event.addCapability(WEAPON_CAPABILITY, new SlottedNetheriteWeaponProvider());
             } else if (material.equals(EtherGemsItemTier.MONADO)) {
                 event.addCapability(WEAPON_CAPABILITY, new MonadoProvider());
             } else {
@@ -118,6 +119,8 @@ public class CapabilityEvents {
                 event.addCapability(WEAPON_CAPABILITY, new SlottedGoldWeaponProvider());
             } else if (material.equals(ItemTier.DIAMOND)) {
                 event.addCapability(WEAPON_CAPABILITY, new SlottedDiamondWeaponProvider());
+            } else if (material.equals(ItemTier.NETHERITE)) {
+                event.addCapability(WEAPON_CAPABILITY, new SlottedNetheriteWeaponProvider());
             } else {
                 event.addCapability(WEAPON_CAPABILITY, new SlottedWeaponProvider());
             }

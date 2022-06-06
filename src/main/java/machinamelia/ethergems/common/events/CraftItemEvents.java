@@ -13,6 +13,7 @@ package machinamelia.ethergems.common.events;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
+import net.minecraft.inventory.container.SmithingTableContainer;
 import net.minecraft.inventory.container.WorkbenchContainer;
 import net.minecraft.item.*;
 import net.minecraft.util.NonNullList;
@@ -120,6 +121,69 @@ public class CraftItemEvents {
 
                 }
             });
+        } else if (event.getContainer() instanceof SmithingTableContainer) {
+            SmithingTableContainer smithingTableContainer = (SmithingTableContainer) event.getContainer();
+            smithingTableContainer.addSlotListener(new IContainerListener() {
+                @Override
+                public void refreshContainer(Container containerToSend, NonNullList<ItemStack> itemsList) {
+                    for (int i = 0; i < itemsList.size(); i++) {
+                        ItemStack itemStack = itemsList.get(i);
+                        if (itemStack.getItem() instanceof SlottedArmor) {
+                            LazyOptional<ISlottedArmor> armorCapability = itemStack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
+                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
+                            if (!armor.getHasInited()) {
+                                armor.init();
+                                if (armor.getSlots() < 1) {
+                                    itemStack = resetItem(itemStack, armor);
+                                }
+                            }
+                        }
+                        if (itemStack.getItem() instanceof SlottedSword || itemStack.getItem() instanceof SlottedAxe) {
+                            LazyOptional<ISlottedWeapon> weaponCapability = itemStack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
+                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
+                            if (!weapon.getHasInited()) {
+                                weapon.init();
+                                if (weapon.getSlots() < 1) {
+                                    itemStack = resetItem(itemStack, weapon);
+                                }
+                            }
+                        }
+                        containerToSend.setItem(i, itemsList.get(i));
+                    }
+                }
+
+                @Override
+                public void slotChanged(Container containerToSend, int slotInd, ItemStack stack) {
+                    if (containerToSend.getSlot(slotInd) != null) {
+                        if (stack.getItem() instanceof SlottedArmor) {
+                            LazyOptional<ISlottedArmor> armorCapability = stack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
+                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
+                            if (!armor.getHasInited()) {
+                                armor.init();
+                                if (armor.getSlots() < 1) {
+                                    stack = resetItem(stack, armor);
+                                }
+                            }
+                        }
+                        if (stack.getItem() instanceof SlottedSword || stack.getItem() instanceof SlottedAxe) {
+                            LazyOptional<ISlottedWeapon> weaponCapability = stack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
+                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
+                            if (!weapon.getHasInited()) {
+                                weapon.init();
+                                if (weapon.getSlots() < 1) {
+                                    stack = resetItem(stack, weapon);
+                                }
+                            }
+                        }
+                        containerToSend.setItem(slotInd, stack);
+                    }
+                }
+
+                @Override
+                public void setContainerData(Container containerIn, int varToUpdate, int newValue) {
+
+                }
+            });
         }
     }
 
@@ -136,6 +200,8 @@ public class CraftItemEvents {
                 stack = new ItemStack(Items.GOLDEN_SWORD);
             } else if (swordItem.getTier().equals(ItemTier.DIAMOND)) {
                 stack = new ItemStack(Items.DIAMOND_SWORD);
+            } else if (swordItem.getTier().equals(ItemTier.NETHERITE)) {
+                stack = new ItemStack(Items.NETHERITE_SWORD);
             }
         }
         if (stack.getItem() instanceof SlottedAxe) {
@@ -150,6 +216,8 @@ public class CraftItemEvents {
                 stack = new ItemStack(Items.GOLDEN_AXE);
             } else if (axeItem.getTier().equals(ItemTier.DIAMOND)) {
                 stack = new ItemStack(Items.DIAMOND_AXE);
+            } else if (axeItem.getTier().equals(ItemTier.NETHERITE)) {
+                stack = new ItemStack(Items.NETHERITE_AXE);
             }
         }
         return stack;
@@ -197,6 +265,16 @@ public class CraftItemEvents {
                     stack = new ItemStack(Items.DIAMOND_LEGGINGS);
                 } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
                     stack = new ItemStack(Items.DIAMOND_BOOTS);
+                }
+            } else if (armorItem.getMaterial().equals(ArmorMaterial.NETHERITE)) {
+                if (armorItem.getSlot().equals(EquipmentSlotType.HEAD)) {
+                    stack = new ItemStack(Items.NETHERITE_HELMET);
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.CHEST)) {
+                    stack = new ItemStack(Items.NETHERITE_CHESTPLATE);
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.LEGS)) {
+                    stack = new ItemStack(Items.NETHERITE_LEGGINGS);
+                } else if (armorItem.getSlot().equals(EquipmentSlotType.FEET)) {
+                    stack = new ItemStack(Items.NETHERITE_BOOTS);
                 }
             }
         }
