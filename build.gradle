@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-2.0.0.0-beta1'
+version = '1.16.5-2.0.0.0-beta2'
 group = 'machinamelia.ethergems' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'ethergems'
 
