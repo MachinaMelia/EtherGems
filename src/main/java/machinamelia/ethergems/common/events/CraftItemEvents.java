@@ -42,20 +42,17 @@ public class CraftItemEvents {
         if (item instanceof SlottedArmor) {
             LazyOptional<ISlottedArmor> armorCapability = itemStack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
             ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
-            if (!armor.getHasInited()) {
-                armor.init();
-                event.getInventory().setChanged();
-            }
+            armor.init();
+            event.getInventory().setChanged();
         }
         if (item instanceof SlottedSword || item instanceof SlottedAxe) {
             LazyOptional<ISlottedWeapon> weaponCapability = itemStack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
             ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
-            if (!weapon.getHasInited()) {
-                weapon.init();
-                event.getInventory().setChanged();
-            }
+            weapon.init();
+            event.getInventory().setChanged();
         }
     }
+
     @SubscribeEvent
     public static void craftingContainerEvent(PlayerContainerEvent event) {
         if (event.getContainer() instanceof WorkbenchContainer) {
@@ -67,22 +64,16 @@ public class CraftItemEvents {
                         ItemStack itemStack = itemsList.get(i);
                         if (itemStack.getItem() instanceof SlottedArmor) {
                             LazyOptional<ISlottedArmor> armorCapability = itemStack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
-                            if (!armor.getHasInited()) {
-                                armor.init();
-                                if (armor.getSlots() < 1) {
-                                    itemStack = resetItem(itemStack, armor);
-                                }
+                            ISlottedArmor armor = armorCapability.orElseThrow(IllegalStateException::new);
+                            if (armor.getSlots() < 1) {
+                                itemStack = resetItem(itemStack, armor);
                             }
                         }
                         if (itemStack.getItem() instanceof SlottedSword || itemStack.getItem() instanceof SlottedAxe) {
                             LazyOptional<ISlottedWeapon> weaponCapability = itemStack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
-                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
-                            if (!weapon.getHasInited()) {
-                                weapon.init();
-                                if (weapon.getSlots() < 1) {
-                                    itemStack = resetItem(itemStack, weapon);
-                                }
+                            ISlottedWeapon weapon = weaponCapability.orElseThrow(IllegalStateException::new);
+                            if (weapon.getSlots() < 1) {
+                                itemStack = resetItem(itemStack, weapon);
                             }
                         }
                         containerToSend.setItem(i, itemsList.get(i));
@@ -94,22 +85,16 @@ public class CraftItemEvents {
                     if (containerToSend.getSlot(slotInd) != null) {
                         if (stack.getItem() instanceof SlottedArmor) {
                             LazyOptional<ISlottedArmor> armorCapability = stack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
-                            if (!armor.getHasInited()) {
-                                armor.init();
-                                if (armor.getSlots() < 1) {
-                                    stack = resetItem(stack, armor);
-                                }
+                            ISlottedArmor armor = armorCapability.orElseThrow(IllegalStateException::new);
+                            if (armor.getSlots() < 1) {
+                                stack = resetItem(stack, armor);
                             }
                         }
                         if (stack.getItem() instanceof SlottedSword || stack.getItem() instanceof SlottedAxe) {
                             LazyOptional<ISlottedWeapon> weaponCapability = stack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
-                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
-                            if (!weapon.getHasInited()) {
-                                weapon.init();
-                                if (weapon.getSlots() < 1) {
-                                    stack = resetItem(stack, weapon);
-                                }
+                            ISlottedWeapon weapon = weaponCapability.orElseThrow(IllegalStateException::new);
+                            if (weapon.getSlots() < 1) {
+                                stack = resetItem(stack, weapon);
                             }
                         }
                         containerToSend.setItem(slotInd, stack);
@@ -130,22 +115,16 @@ public class CraftItemEvents {
                         ItemStack itemStack = itemsList.get(i);
                         if (itemStack.getItem() instanceof SlottedArmor) {
                             LazyOptional<ISlottedArmor> armorCapability = itemStack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
-                            if (!armor.getHasInited()) {
-                                armor.init();
-                                if (armor.getSlots() < 1) {
-                                    itemStack = resetItem(itemStack, armor);
-                                }
+                            ISlottedArmor armor = armorCapability.orElseThrow(IllegalStateException::new);
+                            if (armor.getSlots() < 1) {
+                                itemStack = resetItem(itemStack, armor);
                             }
                         }
                         if (itemStack.getItem() instanceof SlottedSword || itemStack.getItem() instanceof SlottedAxe) {
                             LazyOptional<ISlottedWeapon> weaponCapability = itemStack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
-                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
-                            if (!weapon.getHasInited()) {
-                                weapon.init();
-                                if (weapon.getSlots() < 1) {
-                                    itemStack = resetItem(itemStack, weapon);
-                                }
+                            ISlottedWeapon weapon = weaponCapability.orElseThrow(IllegalStateException::new);
+                            if (weapon.getSlots() < 1) {
+                                itemStack = resetItem(itemStack, weapon);
                             }
                         }
                         containerToSend.setItem(i, itemsList.get(i));
@@ -157,22 +136,16 @@ public class CraftItemEvents {
                     if (containerToSend.getSlot(slotInd) != null) {
                         if (stack.getItem() instanceof SlottedArmor) {
                             LazyOptional<ISlottedArmor> armorCapability = stack.getCapability(SlottedArmorProvider.ARMOR_CAPABILITY);
-                            ISlottedArmor armor = armorCapability.orElse(new SlottedArmorInstance());
-                            if (!armor.getHasInited()) {
-                                armor.init();
-                                if (armor.getSlots() < 1) {
-                                    stack = resetItem(stack, armor);
-                                }
+                            ISlottedArmor armor = armorCapability.orElseThrow(IllegalStateException::new);
+                            if (armor.getSlots() < 1) {
+                                stack = resetItem(stack, armor);
                             }
                         }
                         if (stack.getItem() instanceof SlottedSword || stack.getItem() instanceof SlottedAxe) {
                             LazyOptional<ISlottedWeapon> weaponCapability = stack.getCapability(SlottedWeaponProvider.WEAPON_CAPABILITY);
-                            ISlottedWeapon weapon = weaponCapability.orElse(new SlottedWeaponInstance());
-                            if (!weapon.getHasInited()) {
-                                weapon.init();
-                                if (weapon.getSlots() < 1) {
-                                    stack = resetItem(stack, weapon);
-                                }
+                            ISlottedWeapon weapon = weaponCapability.orElseThrow(IllegalStateException::new);
+                            if (weapon.getSlots() < 1) {
+                                stack = resetItem(stack, weapon);
                             }
                         }
                         containerToSend.setItem(slotInd, stack);
